@@ -1,10 +1,27 @@
 ARG VERSION=latest
 FROM php:${VERSION}-cli
 
+RUN apt-get update
+RUN apt-get install -y git libzip-dev zip
+RUN docker-php-ext-install zip
+
 RUN echo "phar.readonly = Off" >> /usr/local/etc/php/php.ini
+
+RUN useradd -m php
+USER php
+
+WORKDIR /tmp
+
+RUN curl https://getcomposer.org/installer > composer-setup.php
+RUN curl https://composer.github.io/installer.sha384sum > installer.sha384sum
+RUN sha384sum -c installer.sha384sum
+RUN php composer-setup.php
+RUN rm -f composer-setup.php
+
+USER root
+RUN mv composer.phar /usr/local/bin/composer
 
 RUN mkdir /app
 WORKDIR /app
 
-RUN useradd php
 USER php
