@@ -58,7 +58,7 @@ function create_command()
 
 podman run --rm $OPTIONS --name ${NAME}_\$$ ${VOLUMES} ${PORTS} ${WORKDIR} localhost/cc_${1}:${2} ${4} \$*
 EOF
-    chmod +x ./bin/$1_$2
+    chmod +x ./bin/$3_$2
   else
 NAME=$(echo "$1_$2" | sed -r 's/[^[:alnum:]]+/_/g')
     cat > ./bin/$1_$2 << EOF
