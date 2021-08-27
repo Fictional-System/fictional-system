@@ -1,0 +1,81 @@
+#!/usr/bin/sh
+
+if [ $# -lt 2 ]
+then
+  exit 1
+fi
+
+function create_command()
+{
+  OPTIONS=""
+  VOLUMES=""
+  PORTS=""
+  WORKDIR=""
+
+  if [ -f ./$1/local/options ]
+  then
+    while IFS="=" read -r OPTION_NAME OPTION_VALUE;
+    do
+      if [[ "$OPTION_NAME" == "interactive" ]]; then
+        if [[ "$OPTION_VALUE" == "true" ]]; then
+          OPTIONS="$OPTIONS -it"
+        fi
+      elif [[ "$OPTION_NAME" == "detached" ]]; then
+        if [[ "$OPTION_VALUE" == "true" ]]; then
+          OPTIONS="$OPTIONS -d"
+        fi
+      elif [[ "$OPTION_NAME" == "idmatch" ]]; then
+        if [[ "$OPTION_VALUE" == "true" ]]; then
+          OPTIONS="$OPTIONS --userns=keep-id"
+        fi
+      elif [[ "$OPTION_NAME" == "workdir" ]]; then
+        WORKDIR="-w $OPTION_VALUE"
+      fi
+    done < ./$1/local/options;
+  fi
+
+  if [ -f ./$1/local/volumes ]
+  then
+    while IFS= read -r VOLUME;
+    do
+      VOLUMES="$VOLUMES --volume $VOLUME:z"
+    done < ./$1/local/volumes;
+  fi
+
+  if [ -f ./$1/local/ports ]
+  then
+    while IFS= read -r PORT;
+    do
+      PORTS="$PORTS --publish $PORT"
+    done < ./$1/local/ports;
+  fi
+
+  if [ $# -eq 4 ]
+  then
+    NAME=$(echo "$1_$2" | sed -r 's/[^[:alnum:]]+/_/g')
+    cat > ./bin/$3_$2 << EOF
+#!/usr/bin/sh
+
+podman run --rm $OPTIONS --name ${NAME}_\$$ ${VOLUMES} ${PORTS} ${WORKDIR} localhost/cc_${1}:${2} ${4} \$*
+EOF
+    chmod +x ./bin/$1_$2
+  else
+NAME=$(echo "$1_$2" | sed -r 's/[^[:alnum:]]+/_/g')
+    cat > ./bin/$1_$2 << EOF
+#!/usr/bin/sh
+
+podman run --rm $OPTIONS --name ${NAME}_\$$ ${VOLUMES} ${PORTS} ${WORKDIR} localhost/cc_${1}:${2}
+EOF
+    chmod +x ./bin/$1_$2
+  fi
+}
+
+if [ -f ./$1/local/commands ]
+then
+  while IFS="=" read -r COMMAND_NAME COMMAND_VALUE;
+  do
+    create_command $1 $2 $COMMAND_NAME $COMMAND_VALUE
+  done < ./$1/local/commands;
+else
+  create_command $1 $2
+fi
