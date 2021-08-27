@@ -2,10 +2,12 @@ ARG VERSION=latest
 FROM php:${VERSION}-cli
 
 RUN apt-get update
-RUN apt-get install -y git libzip-dev zip
+RUN apt-get install -y git zip libzip-dev
 RUN docker-php-ext-install zip
+RUN pecl install xdebug
 
 RUN echo "phar.readonly = Off" >> /usr/local/etc/php/php.ini
+RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" >> /usr/local/etc/php/php.ini
 
 RUN useradd -m php
 USER php
