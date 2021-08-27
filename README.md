@@ -66,6 +66,10 @@ If this file is not present the command will have the name of the **directory** 
 
 ### Special configuration
 
+#### Php - Composer
+
+Composer cache is located in ~/.composer/cache.
+
 #### Samba
 
 - smb.conf : Config file for samba.
