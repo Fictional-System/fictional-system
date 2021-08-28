@@ -74,7 +74,7 @@ if [ -f ./$1/local/commands ]
 then
   while IFS="=" read -r COMMAND_NAME COMMAND_VALUE;
   do
-    create_command $1 $2 $COMMAND_NAME $COMMAND_VALUE
+    create_command $1 $2 $COMMAND_NAME "$COMMAND_VALUE"
   done < ./$1/local/commands;
 else
   create_command $1 $2
