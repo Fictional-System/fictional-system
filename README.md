@@ -61,8 +61,16 @@ List of versions to build.
 List of volumes to attach to the container.
 
 ### commands
-List of commands in command_for_host=command_in_container format.
+List of commands in *command_for_host*=*command_in_container* format.
 If this file is not present the command will have the name of the **directory** and will not take any arguments.
+
+### env
+List of environment variables included for commands.
+Format : VARNAME=VALUE.
+One variable per line.
+
+### *command_for_host*_env
+List of environment variables included for the command *command_for_host* only.
 
 ### Special configuration
 
