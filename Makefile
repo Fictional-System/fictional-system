@@ -14,6 +14,7 @@ force_clean: clean $(DIRS:./%/.=force_clean_%)
 prepare_install:
 	rm -rf ./bin
 	mkdir -p ./bin
+	chmod +x ./install
 	echo $${PATH} | grep -q $${PWD}/bin || grep -Eq "^CC_PATH=" ~/.bashrc || (echo "CC_PATH=$${PWD}/bin:\$$PATH && export PATH=\$$CC_PATH" >> ~/.bashrc && echo -e "\033[0;33mYou need to restart your bash to use the new PATH.\033[0m")
 
 prepare_%: %
