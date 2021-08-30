@@ -11,6 +11,9 @@ clean: $(DIRS:./%/.=clean_%)
 	rm -rf ./bin
 	sed -i '/^CC_PATH=/d' ~/.bashrc
 force_clean: clean $(DIRS:./%/.=force_clean_%)
+enable_all: $(DIRS:./%/.=enable_%)
+disable_all: $(DIRS:./%/.=disable_%)
+
 prepare_install:
 	rm -rf ./bin
 	mkdir -p ./bin
@@ -41,4 +44,4 @@ enable_%: %
 disable_%: %
 	[ -d ./$< ] && touch ./$</.disabled
 
-.PHONY: all force prepare build force_build install clean force_clean prepare_install
+.PHONY: all force prepare build force_build install clean force_clean enable_all disable_all prepare_install
