@@ -43,12 +43,28 @@ function create_command()
     done < ./$1/local/volumes;
   fi
 
+  if [ -f ./$1/local/$3_volumes ]
+  then
+    while IFS= read -r VOLUME;
+    do
+      VOLUMES="$VOLUMES --volume $VOLUME:z"
+    done < ./$1/local/$3_volumes;
+  fi
+
   if [ -f ./$1/local/ports ]
   then
     while IFS= read -r PORT;
     do
       PORTS="$PORTS --publish $PORT"
     done < ./$1/local/ports;
+  fi
+
+  if [ -f ./$1/local/$3_ports ]
+  then
+    while IFS= read -r PORT;
+    do
+      PORTS="$PORTS --publish $PORT"
+    done < ./$1/local/$3_ports;
   fi
 
   if [ -f ./$1/local/env ]
