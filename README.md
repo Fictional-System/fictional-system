@@ -17,6 +17,8 @@ You have to build all images and commands by using Make. The build is execute on
 - build : Build the image with **local** as context.
 - install : Recreate the **bin** directory and all scripts inside it. Also add new PATH in .bashrc.
 - clean : Remove all images, **bin** directory and PATH from .bashrc.
+- enable_all : Enable all directories.
+- disable_all : Disable all directories.
 - prepare_install : Is a pre-install rule (don't use it).
 
 You also have forced rules.
@@ -69,10 +71,22 @@ List of environment variables included for commands.
 Format : VARNAME=VALUE.
 One variable per line.
 
-### *command_for_host*_env
-List of environment variables included for the command *command_for_host* only.
+### *command_for_host*_*file*
+List of variables included for the command *command_for_host* only.
+
+Support :
+- *command_for_host*_ports
+- *command_for_host*_volumes
+- *command_for_host*_env
 
 ### Special configuration
+
+#### Node - Angular, Ionic
+
+Provide separate serve commands with the ports provided to be able to use the CLI while server is running.
+
+NB : Ionic Lab cannot be used on a remote host until this PR is merged.
+https://github.com/ionic-team/ionic-cli/pull/4650
 
 #### Php - Composer
 
@@ -89,3 +103,5 @@ After build you have a bunch of commands.
 The format is *command*_*version*.
 If **commands** file is present a *command* is available for each *command_for_host*.
 If not *command* is the name of the **directory**.
+
+A command without version is also created (just *command*). The version used for this is the first version of the file **versions**
