@@ -1,0 +1,22 @@
+ARG VERSION=latest
+ARG APK_ADD=""
+ARG APK_TEMP_ADD=""
+ARG DOCKER_PHP_EXT_INSTALL=""
+ARG PECL_INSTALL=""
+ARG DOCKER_PHP_EXT_ENABLE=""
+
+FROM php:${VERSION}-cli-alpine
+
+RUN apk add --no-cache ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS}
+RUN docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}
+RUN pecl install ${PECL_INSTALL}
+RUN docker-php-ext-enable ${DOCKER_PHP_EXT_ENABLE}
+RUN apk del ${APK_TEMP_ADD} ${PHPIZE_DEPS}
+
+COPY php.ini /usr/local/etc/php/php.ini
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN addgroup --gid 1000 php && adduser -u 1000 -G php -s /bin/bash -D php
+USER php

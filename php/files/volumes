@@ -1,2 +1,0 @@
-$PWD:/app
-$HOME/.composer/cache:/home/php/.composer/cache

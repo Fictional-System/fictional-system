@@ -1,0 +1,9 @@
+name=php_xdebug
+commmand=php
+versions=8
+volumes=$PWD:/app
+from=php
+
+interactive=true
+detached=false
+idmatch=true

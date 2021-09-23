@@ -1,0 +1,8 @@
+ARG VERSION=latest
+
+FROM docker.io/library/node:${VERSION}-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+USER node
