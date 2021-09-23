@@ -34,39 +34,80 @@ fs_usage() {
 }
 
 fs_error() {
-  echo "Error: unrecognized command \`fs $*\`"
+  echo >&2 "Error: unrecognized command \`fs $*\`"
 }
 
 fs_disable() {
-  if [ -f ./$1/.disabled ]
+  if [ -f ./$1/$2/.disabled ]
   then
-    echo "${1} is already disable."
+    echo "${1}/${2} is already disabled."
   else
-    touch ./$1/.disabled && echo "${1} disabled." || echo "Cannot disable ${1}."
+    touch ./$1/$2/.disabled && echo "${1}/${2} disabled." || >&2 echo "${1}/${2} cannot be disabled."
   fi
 }
 
 fs_enable() {
-  if [ -f ./$1/.disabled ]
+  if [ -f ./$1/$2/.disabled ]
   then
-    rm -f ./$1/.disabled && echo "${1} enabled." || echo "Cannot enable ${1}."
+    rm -f ./$1/$2/.disabled && echo "${1}/${2} enabled." || >&2 echo "${1}/${2} cannot be enabled."
   else
-    echo "${1} is already enable."
+    echo "${1}/${2} is already enabled."
   fi
 }
 
-fs_change_status() {
+fs_change_command_status() {
+  if [ -d "$2/$3" ]
+  then
+    $1 $2 $3
+  else
+    echo >&2 "Error: \`${2}/${3}\` is not a valid component."
+  fi
+}
+
+fs_change_component_status() {
+  if [ $# -eq 2 ]
+  then
+    for directory in ${2}/*
+    do
+      if [ -d "$directory" ]
+      then
+        fs_change_command_status $1 $2 ${directory#"${2}/"}
+      fi
+    done
+  elif [ $# -eq 3 ]
+  then
+    fs_change_command_status $1 $2 $3
+  else
+    fs_change_command_status $1 $2 $3 $4
+  fi
+}
+
+fs_change_domain_status() {
   if [ $# -gt 1 ]
   then
-    for domain in ${@:2}
+    for value in ${@:2}
     do
+      IFS="/"; read -ra parts <<< "${value}"; IFS=" ";
+      local domain=${parts[0]}
+      local component=${parts[1]}
+      local command=${parts[2]}
       if [ -d "$domain" ]
       then
         if [ "$domain" == "bin" ]
         then
           >&2 echo "${domain} is not a valid domain."
         else
-            $1 "$domain"
+          if [ ${#parts[@]} -gt 1 ]
+          then
+            if [ ${#parts[@]} -gt 2 ]
+            then
+              fs_change_component_status "$1" "$domain" "$component" "$command"
+            else
+              fs_change_component_status "$1" "$domain" "$component"
+            fi
+          else
+            fs_change_component_status "$1" "$domain"
+          fi
         fi
       elif [ "$domain" == "all" ]
       then
@@ -74,11 +115,11 @@ fs_change_status() {
         do
           if [ -d "$directory" ] && [ "$directory" != "bin" ]
           then
-            $1 "$directory"
+            fs_change_component_status "$1" "$directory"
           fi
         done
       else
-        >&2 echo "${domain} is not a valid domain."
+        >&2 echo "Error: \`${domain}\` is not a valid domain."
       fi
     done
   else
@@ -91,9 +132,9 @@ then
   fs_usage
 else
   if [[ "$1" == "disable" ]]; then
-    fs_change_status fs_disable ${@:2}
+    fs_change_domain_status fs_disable ${@:2}
   elif [[ "$1" == "enable" ]]; then
-    fs_change_status fs_enable ${@:2}
+    fs_change_domain_status fs_enable ${@:2}
   else
     fs_error $*
     fs_usage
