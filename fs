@@ -42,16 +42,14 @@ fs_disable() {
   then
     echo "${1} is already disable."
   else
-    touch ./$1/.disabled
-    echo "${1} disabled."
+    touch ./$1/.disabled && echo "${1} disabled." || echo "Cannot disable ${1}."
   fi
 }
 
 fs_enable() {
   if [ -f ./$1/.disabled ]
   then
-    rm -f ./$1/.disabled
-    echo "${1} enabled."
+    rm -f ./$1/.disabled && echo "${1} enabled." || echo "Cannot enable ${1}."
   else
     echo "${1} is already enable."
   fi
