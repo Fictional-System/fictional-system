@@ -1,0 +1,9 @@
+name=npm
+commmand=npm
+versions=16
+volumes=$PWD:/app
+from=
+
+interactive=true
+detached=false
+idmatch=true

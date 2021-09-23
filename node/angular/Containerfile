@@ -1,0 +1,11 @@
+ARG VERSION=latest
+
+FROM localhost/fs/node/npm:${VERSION}
+
+USER root
+
+RUN apk add --no-cache git
+
+RUN npm install -g @angular/cli 
+
+USER node

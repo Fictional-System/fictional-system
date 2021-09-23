@@ -1,6 +1,0 @@
-npm=npm
-ng=ng
-ionic=ionic
-ng-serve=ng serve --disable-host-check
-ionic-serve=ionic serve --external --no-open -- --disable-host-check
-ionic-lab=ionic serve --external --no-open --lab --lab-host=0.0.0.0 -- --disable-host-check
