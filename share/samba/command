@@ -1,0 +1,9 @@
+name=php
+commmand=php
+versions=34
+volumes=/data/share:/data/share
+ports=139:139 445:445 137:137/udp 138:138/udp
+from=
+
+interactive=false
+detached=true
