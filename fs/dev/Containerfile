@@ -1,0 +1,7 @@
+FROM php:8-cli-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN addgroup --gid 1000 php && adduser -u 1000 -G php -s /bin/bash -D php
+USER php
