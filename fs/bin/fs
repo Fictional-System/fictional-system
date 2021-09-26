@@ -1,0 +1,11 @@
+#!/bin/sh
+
+dir=$(dirname $(dirname "$0"))
+name="localhost/fs/fs/fs"
+
+if [ $(podman images -q $name | wc -l) -eq 0 ]
+then
+  podman build -t $name -f ${dir}/fs/Containerfile ${dir}/sources
+fi
+
+podman run --rm --name fs_dev_$$ -v ${PWD}:/app:z $name php /usr/local/bin/fs.phar $*

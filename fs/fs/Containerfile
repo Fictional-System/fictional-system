@@ -1,0 +1,22 @@
+FROM php:8-cli-alpine as builder
+
+RUN echo "phar.readonly = Off" >> /usr/local/etc/php/php.ini
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN addgroup --gid 1000 php && adduser -u 1000 -G php -s /bin/bash -D php
+USER php
+
+COPY . /app
+RUN php build.php
+
+FROM php:8-cli-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN addgroup --gid 1000 php && adduser -u 1000 -G php -s /bin/bash -D php
+USER php
+
+COPY --from=builder /tmp/fs.phar /usr/local/bin/fs.phar
