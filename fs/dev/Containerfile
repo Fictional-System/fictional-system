@@ -1,4 +1,4 @@
-FROM php:8-cli-alpine
+FROM docker.io/library/php:8-cli-alpine
 
 RUN mkdir /app
 WORKDIR /app

@@ -1,4 +1,4 @@
-FROM php:8-cli-alpine as builder
+FROM docker.io/library/php:8-cli-alpine as builder
 
 RUN echo "phar.readonly = Off" >> /usr/local/etc/php/php.ini
 
