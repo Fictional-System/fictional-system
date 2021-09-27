@@ -1,47 +1,19 @@
-DIRS = $(filter-out ./bin/., $(wildcard ./*/.))
+PREFIX="localhost/fs/"
 
-all: prepare build install
-force: prepare force_build install
+all: install
 
-prepare: $(DIRS:./%/.=prepare_%)
-build: $(DIRS:./%/.=build_%)
-force_build: $(DIRS:./%/.=force_build_%)
-install: prepare_install $(DIRS:./%/.=install_%)
-clean: $(DIRS:./%/.=clean_%)
-	rm -rf ./bin
-	sed -i '/^CC_PATH=/d' ~/.bashrc
-force_clean: clean $(DIRS:./%/.=force_clean_%)
-enable_all: $(DIRS:./%/.=enable_%)
-disable_all: $(DIRS:./%/.=disable_%)
-
-prepare_install:
-	rm -rf ./bin
+install:
 	mkdir -p ./bin
-	chmod +x ./install
-	echo $${PATH} | grep -q $${PWD}/bin || grep -Eq "^CC_PATH=" ~/.bashrc || (echo "CC_PATH=$${PWD}/bin:\$$PATH && export PATH=\$$CC_PATH" >> ~/.bashrc && echo -e "\033[0;33mYou need to restart your bash to use the new PATH.\033[0m")
+	cp -f ./fs/bin/fs ./bin/fs
+	[ $$(podman images --quiet ${PREFIX}fs/fs | wc -l) -gt 0 ] || podman build -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
+	echo $${PATH} | grep -q $${PWD}/bin || grep -Eq "^FS_PATH=$${PWD}/bin" ~/.$${SHELL##*/}rc || (echo "FS_PATH=$${PWD}/bin:\$$PATH && export PATH=\$$FS_PATH" >> ~/.$${SHELL##*/}rc && echo -e "\033[0;33mYou need to restart your $${SHELL##*/} to use the new PATH.\033[0m")
 
-prepare_%: %
-	[ -f ./$</.disabled ] || if [ -d ./$</files ]; then mkdir -p ./$</local && cp -n ./$</files/* ./$</local/ || exit; fi
+uninstall:
+	rm -rf ./bin
+	[ $$(podman images --quiet ${PREFIX} | wc -l) -eq 0 ] || podman rmi -f $$(podman images --quiet ${PREFIX})
+	sed -i "/^FS_PATH=$${PWD//\//\\/}\/bin/d" ~/.$${SHELL##*/}rc
 
-build_%: %
-	[ -f ./$</.disabled ] || if [ -f ./$</local/versions ]; then while IFS= read -r VERSION; do podman build -t localhost/cc_$<:$${VERSION} -f ./$</Containerfile --build-arg VERSION=$${VERSION} ./$</local || exit; done < ./$</local/versions; fi
+update: install
+	podman build --no-cache --pull-always -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
 
-force_build_%: %
-	[ -f ./$</.disabled ] || if [ -f ./$</local/versions ]; then while IFS= read -r VERSION; do podman build --pull-always -t localhost/cc_$<:$${VERSION} -f ./$</Containerfile --build-arg VERSION=$${VERSION} ./$</local || exit; done < ./$</local/versions; fi
-
-install_%: %
-	[ -f ./$</.disabled ] || if [ -f ./$</local/versions ]; then while IFS= read -r VERSION; do ./install $< $${VERSION} || exit; done < ./$</local/versions; fi
-
-clean_%: %
-	[ -f ./$</.disabled ] || [ $$(podman images --quiet localhost/cc_$< | wc -l) -eq 0 ] || podman rmi -f $$(podman images --quiet localhost/cc_$<)
-
-force_clean_%: %
-	[ -f ./$</.disabled ] || rm -rf ./$</local
-
-enable_%: %
-	[ -d ./$< ] && rm -f ./$</.disabled
-
-disable_%: %
-	[ -d ./$< ] && touch ./$</.disabled
-
-.PHONY: all force prepare build force_build install clean force_clean enable_all disable_all prepare_install
+.PHONY: all install uninstall update

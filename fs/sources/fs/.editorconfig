@@ -1,0 +1,22 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+tab_width = 2
+trim_trailing_whitespace = true
+
+#IntelliJ Config
+ij_any_block_brace_style = next_line
+ij_any_class_brace_style = next_line
+ij_any_lambda_brace_style = end_of_line
+ij_any_method_brace_style = next_line
+
+[*.php]
+indent_brace_style = Allman
+
+#IntelliJ Config
+ij_php_else_on_new_line = true
