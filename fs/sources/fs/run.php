@@ -8,5 +8,4 @@ spl_autoload_register(function ($classname) {
   }
 });
 
-$fs = new FS\FS($argc, $argv);
-$fs->run();
+exit((new FS\FS($argc, $argv))->call());
