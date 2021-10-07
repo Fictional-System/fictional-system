@@ -26,8 +26,9 @@ abstract class Command implements IUsage
   /**
    * @param Command[] $tab
    */
-  protected function usage(array $tab = []): int
+  protected function usage(array $tab = []): void
   {
+    ob_start();
     $this->displayPart('Description', static::getDescription());
     $this->displayPart('Usage', static::getUsage());
     $this->displayPart('Examples', static::getExamples());
@@ -42,8 +43,7 @@ abstract class Command implements IUsage
       }
       echo PHP_EOL;
     }
-
-    return 1;
+    throw new \RuntimeException(ob_get_clean());
   }
 
   /**
@@ -63,5 +63,5 @@ abstract class Command implements IUsage
     }
   }
 
-  public abstract function call(): int;
+  public abstract function call(): void;
 }

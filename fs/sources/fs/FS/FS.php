@@ -4,6 +4,7 @@ namespace FS;
 
 use Command\Command;
 use Command\Create\Create;
+use Exception;
 
 class FS extends Command
 {
@@ -34,17 +35,31 @@ class FS extends Command
     return [];
   }
 
-  public function call(): int
+  public function call(): void
   {
-    if (($this->argc == 0) || !key_exists($this->argv[0], $this->commands))
+  }
+
+  public function run(): int
+  {
+    try
     {
-      return $this->usage($this->commands);
+      if (($this->argc == 0) || !key_exists($this->argv[0], $this->commands))
+      {
+        $this->usage($this->commands);
+      }
+      else
+      {
+        /** @var Command $command */
+        $command = new $this->commands[$this->argv[0]]($this->argc, $this->argv);
+
+        $command->call();
+      }
     }
-    else
+    catch (Exception $ex)
     {
-      /** @var Command $command */
-      $command = new $this->commands[$this->argv[0]]($this->argc, $this->argv);
-      return $command->call();
+      $this->displayError($ex->getMessage());
+      return 1;
     }
+    return 0;
   }
 }

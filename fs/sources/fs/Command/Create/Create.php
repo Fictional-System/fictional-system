@@ -3,6 +3,7 @@
 namespace Command\Create;
 
 use Command\Command;
+use RuntimeException;
 
 class Create extends Command
 {
@@ -18,7 +19,7 @@ class Create extends Command
 
   public static function getUsage(): array
   {
-    return ["fs create [domain]"];
+    return ["fs create [domain[/component[/command]]]"];
   }
 
   public static function getExamples(): array
@@ -26,9 +27,13 @@ class Create extends Command
     return [];
   }
 
-  public function call(): int
+  public function call(): void
   {
+    if ($this->argc === 0)
+    {
+      $this->usage();
+    }
+
     var_dump($this->argc, $this->argv);
-    return 1;
   }
 }
