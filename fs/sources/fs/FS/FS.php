@@ -3,6 +3,7 @@
 namespace FS;
 
 use Command\Command;
+use Command\Create\Create;
 
 class FS extends Command
 {
@@ -10,12 +11,12 @@ class FS extends Command
    * @var Command[] $commands
    */
   private array $commands = [
-    'create' => "\Command\Create\Create"
+    'create' => Create::class
   ];
 
   public static function getShortDescription(): string
   {
-    return "Manage fictional system images and commands.";
+    return 'Manage fictional system images and commands.';
   }
 
   public static function getDescription(): array
@@ -25,7 +26,7 @@ class FS extends Command
 
   public static function getUsage(): array
   {
-    return ["fs [command]"];
+    return ['fs [command]'];
   }
 
   public static function getExamples(): array
