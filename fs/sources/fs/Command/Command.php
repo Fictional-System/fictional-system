@@ -12,10 +12,21 @@ abstract class Command implements IUsage
     array_shift($this->argv);
   }
 
+  protected function displayError(string $message): int
+  {
+    file_put_contents('php://stderr', $message);
+    return 1;
+  }
+
+  protected function displayException(\Exception $ex): int
+  {
+    return $this->displayError($ex->getMessage());
+  }
+
   /**
    * @param Command[] $tab
    */
-  protected function usage(array $tab): int
+  protected function usage(array $tab = []): int
   {
     $this->displayPart('Description', static::getDescription());
     $this->displayPart('Usage', static::getUsage());
@@ -35,6 +46,10 @@ abstract class Command implements IUsage
     return 1;
   }
 
+  /**
+   * @param string $name
+   * @param string[] $part
+   */
   private function displayPart(string $name, array $part)
   {
     if (count($part))
