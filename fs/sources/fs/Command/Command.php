@@ -12,11 +12,23 @@ abstract class Command implements IUsage
     array_shift($this->argv);
   }
 
+  protected function displayError(string $message): int
+  {
+    file_put_contents('php://stderr', $message);
+    return 1;
+  }
+
+  protected function displayException(\Exception $ex): int
+  {
+    return $this->displayError($ex->getMessage());
+  }
+
   /**
    * @param Command[] $tab
    */
-  protected function usage(array $tab): int
+  protected function usage(array $tab = []): void
   {
+    ob_start();
     $this->displayPart('Description', static::getDescription());
     $this->displayPart('Usage', static::getUsage());
     $this->displayPart('Examples', static::getExamples());
@@ -31,10 +43,13 @@ abstract class Command implements IUsage
       }
       echo PHP_EOL;
     }
-
-    return 1;
+    throw new \RuntimeException(ob_get_clean());
   }
 
+  /**
+   * @param string $name
+   * @param string[] $part
+   */
   private function displayPart(string $name, array $part)
   {
     if (count($part))
@@ -48,5 +63,5 @@ abstract class Command implements IUsage
     }
   }
 
-  public abstract function call(): int;
+  public abstract function call(): void;
 }

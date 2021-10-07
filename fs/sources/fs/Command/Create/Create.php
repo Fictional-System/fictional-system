@@ -3,6 +3,8 @@
 namespace Command\Create;
 
 use Command\Command;
+use Command\Config;
+use RuntimeException;
 
 class Create extends Command
 {
@@ -18,7 +20,7 @@ class Create extends Command
 
   public static function getUsage(): array
   {
-    return ["fs create [domain]"];
+    return ["fs create [domain[/component[/command]]]"];
   }
 
   public static function getExamples(): array
@@ -26,9 +28,98 @@ class Create extends Command
     return [];
   }
 
-  public function call(): int
+  public function call(): void
   {
-    var_dump($this->argc, $this->argv);
-    return 1;
+    if ($this->argc === 0)
+    {
+      $this->usage();
+    }
+
+    foreach ($this->argv as $name)
+    {
+      call_user_func_array([$this, 'createDomain'], explode('/', $name));
+    }
+  }
+
+  private function createDomain(string $domain = null, string $component = null, string $command = null): void
+  {
+    if ($domain === null)
+    {
+      throw new RuntimeException('You must specify at least one domain.');
+    }
+
+    $this->createDir($domain, boolval($component));
+
+    if ($component)
+    {
+      $this->createComponent($domain, $component, $command);
+    }
+    else
+    {
+      echo "Domain `$domain` has been created." . PHP_EOL;
+    }
+  }
+
+  private function createComponent(string $domain, string $component = null, string $command = null): void
+  {
+    if ($component === null)
+    {
+      throw new RuntimeException('You must specify at least one component.');
+    }
+
+    $this->createDir("$domain/$component", true);
+    $this->createDir("$domain/$component/files", true);
+
+    if (!file_exists("$domain/$component/commands.json"))
+    {
+      Config::createTemplate("$domain/$component/commands.json");
+    }
+    elseif (is_dir("$domain/$component/commands.json"))
+    {
+      throw new RuntimeException("Unable to create `$domain/$component/commands.json`. A directory has the same name.");
+    }
+
+    if ($command)
+    {
+      $this->createCommand($domain, $component, $command);
+    }
+    else
+    {
+      echo "Component `$domain/$component` has been created." . PHP_EOL;
+    }
+  }
+
+  private function createCommand(string $domain, string $component, string $command = null): void
+  {
+    $config = new Config("$domain/$component/commands.json");
+
+    if ($config->offsetExists($command))
+    {
+      throw new RuntimeException("Command `$domain/$component/$command` already exist.");
+    }
+    $config->merge(Config::getTemplate(['command' => $command]))->save();
+
+    echo "Command `$domain/$component/$command` has been created." . PHP_EOL;
+  }
+
+  private function createDir(string $dir, bool $force = false): void
+  {
+    if (file_exists($dir))
+    {
+      if (!is_dir($dir))
+      {
+        throw new RuntimeException("Unable to create `$dir`. A file has the same name.");
+      }
+
+      if (!$force)
+      {
+        throw new RuntimeException("`$dir` already exist.");
+      }
+    }
+
+    if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0755))
+    {
+      throw new RuntimeException("Unable to create `$dir`");
+    }
   }
 }

@@ -3,4 +3,4 @@
 dir=$(dirname $(dirname "$0"))
 name="localhost/fs/fs/fs"
 
-podman run --rm -it --name fs_dev_$$ -v ${dir}:/app:z ${name} php /usr/local/bin/fs.phar $*
+podman run --rm -it --userns=keep-id --name fs_dev_$$ -v ${dir}:/app:z ${name} php /usr/local/bin/fs.phar $*
