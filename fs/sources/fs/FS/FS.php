@@ -57,7 +57,7 @@ class FS extends Command
     }
     catch (Exception $ex)
     {
-      $this->displayError($ex->getMessage());
+      $this->displayError($ex->getMessage() . PHP_EOL);
       return 1;
     }
     return 0;
