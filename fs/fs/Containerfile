@@ -17,6 +17,7 @@ RUN mkdir /app
 WORKDIR /app
 
 RUN addgroup --gid 1000 php && adduser -u 1000 -G php -s /bin/bash -D php
+RUN chown php:php /app
 USER php
 
 COPY --from=builder /tmp/fs.phar /usr/local/bin/fs.phar
