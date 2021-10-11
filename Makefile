@@ -1,6 +1,6 @@
-PREFIX="localhost/fs/"
+PREFIX=localhost/fs/
 
-all: install
+all: test install
 
 install:
 	mkdir -p ./bin
@@ -13,7 +13,15 @@ uninstall:
 	[ $$(podman images --quiet ${PREFIX} | wc -l) -eq 0 ] || podman rmi -f $$(podman images --quiet ${PREFIX})
 	sed -i "/^FS_PATH=$${PWD//\//\\/}\/bin/d" ~/.$${SHELL##*/}rc
 
-update: install
+update: test install
 	podman build --no-cache --pull-always -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
 
-.PHONY: all install uninstall update
+test:
+	podman build --no-cache --pull-always -t ${PREFIX}fs/test -f ./fs/fs/Containerfile ./fs/sources
+	podman run --rm -it --userns=keep-id --name fs_test -v ${PWD}/fs/sources:/fs:z ${PREFIX}fs/test php /fs/test/test.php
+
+test-dev:
+	podman build -t ${PREFIX}fs/test-dev -f ${PWD}/fs/dev/Containerfile
+	podman run --rm -it --userns=keep-id --name fs_test_dev -v ${PWD}/fs/sources:/fs:z ${PREFIX}fs/test-dev php /fs/test/test.php dev
+
+.PHONY: all install uninstall update test test-dev
