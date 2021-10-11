@@ -6,10 +6,13 @@ use FS\IUsage;
 
 abstract class Command implements IUsage
 {
+  protected string $cwd;
+
   public function __construct(protected int $argc, protected array $argv)
   {
     $this->argc--;
     array_shift($this->argv);
+    $this->cwd = getcwd();
   }
 
   protected function displayError(string $message): int

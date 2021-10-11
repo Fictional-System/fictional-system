@@ -48,7 +48,7 @@ class Create extends Command
       throw new RuntimeException('You must specify at least one domain.');
     }
 
-    $this->createDir($domain, boolval($component));
+    $this->createDir("$this->cwd/$domain", boolval($component));
 
     if ($component)
     {
@@ -67,14 +67,14 @@ class Create extends Command
       throw new RuntimeException('You must specify at least one component.');
     }
 
-    $this->createDir("$domain/$component", true);
-    $this->createDir("$domain/$component/files", true);
+    $this->createDir("$this->cwd/$domain/$component", true);
+    $this->createDir("$this->cwd/$domain/$component/files", true);
 
-    if (!file_exists("$domain/$component/commands.json"))
+    if (!file_exists("$this->cwd/$domain/$component/commands.json"))
     {
-      Config::createTemplate("$domain/$component/commands.json");
+      Config::createTemplate("$this->cwd/$domain/$component/commands.json");
     }
-    elseif (is_dir("$domain/$component/commands.json"))
+    elseif (is_dir("$this->cwd/$domain/$component/commands.json"))
     {
       throw new RuntimeException("Unable to create `$domain/$component/commands.json`. A directory has the same name.");
     }
@@ -91,7 +91,7 @@ class Create extends Command
 
   private function createCommand(string $domain, string $component, string $command = null): void
   {
-    $config = new Config("$domain/$component/commands.json");
+    $config = new Config("$this->cwd/$domain/$component/commands.json");
 
     if ($config->offsetExists($command))
     {
