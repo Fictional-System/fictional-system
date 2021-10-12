@@ -54,7 +54,9 @@ class Tester
         $parts = explode('.', $d);
         if (count($parts) && ($parts[count($parts) - 1] === 'php'))
         {
-          require_once("$dir/$d");
+          (static function () use ($dir, $d) {
+            require_once("$dir/$d");
+          })();
         }
       }
     }
