@@ -15,7 +15,7 @@ class TestReturn
 
   public function getOutputString(): string
   {
-    return implode('', $this->output);
+    return implode(PHP_EOL, $this->output);
   }
 
   public function getReturn(): int
