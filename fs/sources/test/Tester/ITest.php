@@ -2,9 +2,9 @@
 
 namespace Tester;
 
-interface ITester
+interface ITest
 {
-  public function call(...$args): TestReturn;
+  public function run(...$args): TestReturn;
 
   public function assertFail(): void;
 

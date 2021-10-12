@@ -2,14 +2,13 @@
 
 namespace Tester;
 
-class Tester implements ITester
+class Tester
 {
   /**
    * @var Test[]
    */
   private static array $tests = [];
   private int $lineSize = 10;
-  private Test $currentTest;
 
   public function __construct(private $dev = false)
   {
@@ -79,16 +78,16 @@ class Tester implements ITester
       try
       {
         self::clean();
-        $this->currentTest = $test->reset();
+        $test->reset();
         if (!$this->dev)
           ob_start();
-        $test->call($this);
+        $test->call($this->dev);
         if (!$this->dev)
           ob_end_clean();
       }
       catch (\Exception $e)
       {
-        $this->currentTest->addFailure($e->getFile(), $e->getFile(), 'Unexpected exception : "' . $e->getMessage() . '"');
+        $test->addFailure($e->getFile(), $e->getFile(), 'Unexpected exception : "' . $e->getMessage() . '"');
       }
 
       if (!$test->isFailed())
@@ -130,95 +129,5 @@ class Tester implements ITester
     echo PHP_EOL;
 
     return 1;
-  }
-
-  public function call(...$args): TestReturn
-  {
-    exec(($this->dev ? 'php /fs/fs/run.php ' : 'php /usr/local/bin/fs.phar ') . implode(' ', $args) . ' 2>&1', $output, $return);
-
-    return new TestReturn($output, $return);
-  }
-
-  private function addError(): void
-  {
-    $debug = debug_backtrace();
-    $this->currentTest->addFailure($debug[1]['file'], $debug[1]['line'], $debug[1]['function']);
-  }
-
-  public function assertFail(): void
-  {
-    $this->addError();
-  }
-
-  public function assertTrue(mixed $value): void
-  {
-    if (!$value)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertFalse(mixed $value): void
-  {
-    if ($value)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertEqual(mixed $val1, mixed $val2): void
-  {
-    if ($val1 != $val2)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertEqualStrict(mixed $val1, mixed $val2): void
-  {
-    if ($val1 !== $val2)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertNotEqual(mixed $val1, mixed $val2): void
-  {
-    if ($val1 == $val2)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertNotEqualStrict(mixed $val1, mixed $val2): void
-  {
-    if ($val1 === $val2)
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertFileExist(string $path): void
-  {
-    if (!file_exists($path))
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertDirExist(string $path): void
-  {
-    if (!file_exists($path) || !is_dir($path))
-    {
-      $this->addError();
-    }
-  }
-
-  public function assertFileContent(string $path, string $content): void
-  {
-    if (!file_exists($path) || is_dir($path) || (file_get_contents($path) !== $content))
-    {
-      $this->addError();
-    }
   }
 }
