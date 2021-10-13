@@ -3,7 +3,29 @@
 use Tester\ITest;
 use Tester\Tester;
 
-// TODO factorize duplicate code
+function getCommandTemplate(string $name)
+{
+  return json_decode(str_replace('#command#', $name, json_encode([
+    '#command#' => [
+      'main' => [
+        'command' => '#command#',
+        'enabled' => false,
+        'versions' => ['latest'],
+        'from' => [],
+      ],
+      'options' => [
+        'volumes' => ['$PWD:/app'],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app'
+      ],
+      'arguments' => [],
+      'env' => [],
+    ]
+  ])), true);
+}
 
 Tester::it('Create Domain', function (ITest $tester): void {
   $cr = $tester->run('create test');
@@ -21,26 +43,7 @@ Tester::it('Create Component', function (ITest $tester): void {
   $tester->assertDirExist('test/test/files');
   $tester->assertFileContent('test/test/commands.json',
     json_encode(
-      [
-        'default' => [
-          'main' => [
-            'command' => 'default',
-            'enabled' => false,
-            'versions' => ['latest'],
-            'from' => [],
-          ],
-          'options' => [
-            'volumes' => ['$PWD:/app'],
-            'ports' => [],
-            'interactive' => false,
-            'detached' => false,
-            'match-ids' => false,
-            'workdir' => '/app'
-          ],
-          'arguments' => [],
-          'env' => [],
-        ]
-      ],
+      getCommandTemplate('default'),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
 
@@ -51,44 +54,7 @@ Tester::it('Create Command', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `test/test/test` has been created.');
   $tester->assertDirExist('test/test/files');
   $tester->assertFileContent('test/test/commands.json',
-    json_encode([
-      'default' => [
-        'main' => [
-          'command' => 'default',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'test' => [
-        'main' => [
-          'command' => 'test',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ]
-    ],
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
 
@@ -99,44 +65,7 @@ Tester::it('Create full', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileContent('foo/bar/commands.json',
-    json_encode([
-      'default' => [
-        'main' => [
-          'command' => 'default',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'test' => [
-        'main' => [
-          'command' => 'test',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ]
-    ],
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
 
@@ -147,62 +76,7 @@ Tester::it('Create multiple commands', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/foo` has been created.' . PHP_EOL . 'Command `foo/bar/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileContent('foo/bar/commands.json',
-    json_encode([
-      'default' => [
-        'main' => [
-          'command' => 'default',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'foo' => [
-        'main' => [
-          'command' => 'foo',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'bar' => [
-        'main' => [
-          'command' => 'bar',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ]
-    ],
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('foo'), getCommandTemplate('bar')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
 
@@ -214,83 +88,9 @@ Tester::it('Create commands full', function (ITest $tester): void {
   $tester->assertDirExist('foo/bar/files');
   $tester->assertDirExist('bar/foo/files');
   $tester->assertFileContent('foo/bar/commands.json',
-    json_encode([
-      'default' => [
-        'main' => [
-          'command' => 'default',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'test' => [
-        'main' => [
-          'command' => 'test',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ]
-    ],
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
   $tester->assertFileContent('bar/foo/commands.json',
-    json_encode([
-      'default' => [
-        'main' => [
-          'command' => 'default',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ],
-      'test' => [
-        'main' => [
-          'command' => 'test',
-          'enabled' => false,
-          'versions' => ['latest'],
-          'from' => [],
-        ],
-        'options' => [
-          'volumes' => ['$PWD:/app'],
-          'ports' => [],
-          'interactive' => false,
-          'detached' => false,
-          'match-ids' => false,
-          'workdir' => '/app'
-        ],
-        'arguments' => [],
-        'env' => [],
-      ]
-    ],
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
