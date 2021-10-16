@@ -64,6 +64,22 @@ class Config extends ArrayObject
     return $this;
   }
 
+  public function enable(string $name): Config
+  {
+    return $this->switchStatus($name, true);
+  }
+
+  public function disable(string $name): Config
+  {
+    return $this->switchStatus($name, false);
+  }
+
+  public function switchStatus(string $name, bool $status): Config
+  {
+    $this[$name]['main']['enabled'] = $status;
+    return $this;
+  }
+
   private static function write(string $path, array $content): void
   {
     if (($config = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) === false)
