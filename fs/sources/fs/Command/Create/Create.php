@@ -69,6 +69,7 @@ class Create extends Command
 
     $this->createDir("$this->cwd/$domain/$component", boolval($command));
     $this->createDir("$this->cwd/$domain/$component/files", boolval($command));
+    $this->createFile("$this->cwd/$domain/$component/Containerfile", boolval($command));
 
     if (!file_exists("$this->cwd/$domain/$component/commands.json"))
     {
@@ -120,6 +121,27 @@ class Create extends Command
     if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0755))
     {
       throw new RuntimeException("Unable to create `$dir`");
+    }
+  }
+
+  private function createFile(string $file, bool $force = false, string $content = ""): void
+  {
+    if (file_exists($file))
+    {
+      if (is_dir($file))
+      {
+        throw new RuntimeException("Unable to create `$file`. A directory has the same name.");
+      }
+
+      if (!$force)
+      {
+        throw new RuntimeException("`$file` already exist.");
+      }
+    }
+
+    if (file_put_contents($file, $content) === false)
+    {
+      throw new RuntimeException("Unable to create `$file`");
     }
   }
 }

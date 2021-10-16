@@ -41,6 +41,7 @@ Tester::it('Create Component', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(
       getCommandTemplate('default'),
@@ -53,6 +54,7 @@ Tester::it('Create Command', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -64,6 +66,7 @@ Tester::it('Create full', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -75,6 +78,7 @@ Tester::it('Create multiple commands', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/foo` has been created.' . PHP_EOL . 'Command `foo/bar/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('foo'), getCommandTemplate('bar')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -86,7 +90,9 @@ Tester::it('Create commands full', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.' . PHP_EOL . 'Command `bar/foo/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertDirExist('bar/foo/files');
+  $tester->assertFileExist('bar/foo/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -113,6 +119,7 @@ Tester::it('Create Component Already Exist', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(
       getCommandTemplate('default'),
@@ -129,6 +136,7 @@ Tester::it('Create Command Already Exist', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
+  $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
