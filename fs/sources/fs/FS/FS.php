@@ -4,6 +4,8 @@ namespace FS;
 
 use Command\Command;
 use Command\Create\Create;
+use Command\Status\Disable;
+use Command\Status\Enable;
 use Exception;
 
 class FS extends Command
@@ -12,7 +14,9 @@ class FS extends Command
    * @var Command[] $commands
    */
   private array $commands = [
-    'create' => Create::class
+    'create' => Create::class,
+    'disable' => Disable::class,
+    'enable' => Enable::class,
   ];
 
   public static function getShortDescription(): string
