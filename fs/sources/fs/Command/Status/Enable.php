@@ -21,7 +21,14 @@ class Enable extends SwitchStatus
 
   public static function getExamples(): array
   {
-    return [];
+    return [
+      "fs enable all",
+      "fs enable foo",
+      "fs enable foo/bar",
+      "fs enable foo/bar/test",
+      "fs enable foo/bar/test bar/foo/test",
+      "fs enable foo/bar/foo foo/bar/bar",
+    ];
   }
 
   public function call(): void

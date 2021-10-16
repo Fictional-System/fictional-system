@@ -21,7 +21,14 @@ class Disable extends SwitchStatus
 
   public static function getExamples(): array
   {
-    return [];
+    return [
+      "fs disable all",
+      "fs disable foo",
+      "fs disable foo/bar",
+      "fs disable foo/bar/test",
+      "fs disable foo/bar/test bar/foo/test",
+      "fs disable foo/bar/foo foo/bar/bar",
+    ];
   }
 
   public function call(): void

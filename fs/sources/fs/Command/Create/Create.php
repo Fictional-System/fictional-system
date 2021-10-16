@@ -25,7 +25,12 @@ class Create extends Command
 
   public static function getExamples(): array
   {
-    return [];
+    return [
+      "fs create foo",
+      "fs create foo/bar",
+      "fs create foo/bar/test",
+      "fs create foo/bar/test bar/foo/test",
+    ];
   }
 
   public function call(): void
