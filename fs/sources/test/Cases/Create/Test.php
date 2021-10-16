@@ -94,3 +94,46 @@ Tester::it('Create commands full', function (ITest $tester): void {
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
+
+Tester::it('Create Domain Already Exist', function (ITest $tester): void {
+  $cr = $tester->run('create test');
+
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Domain `test` has been created.');
+  $tester->assertDirExist('test');
+
+  $cr = $tester->run('create test');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), '`/app/test` already exist.');
+});
+
+Tester::it('Create Component Already Exist', function (ITest $tester): void {
+  $cr = $tester->run('create test/test');
+
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Component `test/test` has been created.');
+  $tester->assertDirExist('test/test/files');
+  $tester->assertFileContent('test/test/commands.json',
+    json_encode(
+      getCommandTemplate('default'),
+      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+  $cr = $tester->run('create test/test');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), '`/app/test/test` already exist.');
+});
+
+Tester::it('Create Command Already Exist', function (ITest $tester): void {
+  $cr = $tester->run('create test/test/test');
+
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Command `test/test/test` has been created.');
+  $tester->assertDirExist('test/test/files');
+  $tester->assertFileContent('test/test/commands.json',
+    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
+      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+  $cr = $tester->run('create test/test/test');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Command `test/test/test` already exist.');
+});

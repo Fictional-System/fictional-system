@@ -67,8 +67,8 @@ class Create extends Command
       throw new RuntimeException('You must specify at least one component.');
     }
 
-    $this->createDir("$this->cwd/$domain/$component", true);
-    $this->createDir("$this->cwd/$domain/$component/files", true);
+    $this->createDir("$this->cwd/$domain/$component", boolval($command));
+    $this->createDir("$this->cwd/$domain/$component/files", boolval($command));
 
     if (!file_exists("$this->cwd/$domain/$component/commands.json"))
     {
