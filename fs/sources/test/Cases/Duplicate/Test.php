@@ -107,6 +107,14 @@ Tester::it('Duplicate already exist command', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/foo` already exist.');
 });
 
+Tester::it('Duplicate already exist command bis', function (ITest $tester) {
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/foo/test')->getReturn(), 0);
+  $cr = $tester->run('duplicate foo/bar/test foo/foo/test');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/foo/test` already exist.');
+});
+
 Tester::it('Duplicate already exist component', function (ITest $tester) {
   $tester->assertEqualStrict($tester->run('create foo/bar foo/foo')->getReturn(), 0);
   $cr = $tester->run('duplicate foo/bar foo/foo');
