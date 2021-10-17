@@ -98,3 +98,27 @@ Tester::it('Duplicate component with files', function (ITest $tester) {
     json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 });
+
+Tester::it('Duplicate already exist command', function (ITest $tester) {
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo')->getReturn(), 0);
+  $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/foo` already exist.');
+});
+
+Tester::it('Duplicate already exist component', function (ITest $tester) {
+  $tester->assertEqualStrict($tester->run('create foo/bar foo/foo')->getReturn(), 0);
+  $cr = $tester->run('duplicate foo/bar foo/foo');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/foo` already exist.');
+});
+
+Tester::it('Duplicate already exist domain', function (ITest $tester) {
+  $tester->assertEqualStrict($tester->run('create foo bar')->getReturn(), 0);
+  $cr = $tester->run('duplicate foo bar');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Domain `bar` already exist.');
+});
