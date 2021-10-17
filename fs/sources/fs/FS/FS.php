@@ -4,6 +4,7 @@ namespace FS;
 
 use Command\Command;
 use Command\Create\Create;
+use Command\Duplicate\Duplicate;
 use Command\Status\Disable;
 use Command\Status\Enable;
 use Exception;
@@ -16,6 +17,7 @@ class FS extends Command
   private array $commands = [
     'create' => Create::class,
     'disable' => Disable::class,
+    'duplicate' => Duplicate::class,
     'enable' => Enable::class,
   ];
 
