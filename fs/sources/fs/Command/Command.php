@@ -2,7 +2,9 @@
 
 namespace Command;
 
+use Exception;
 use FS\IUsage;
+use RuntimeException;
 
 abstract class Command implements IUsage
 {
@@ -15,13 +17,43 @@ abstract class Command implements IUsage
     $this->cwd = getcwd();
   }
 
+  /**
+   * @throws Exception
+   */
+  public static function callCommand(string $name, array $args, bool $quiet = false): void
+  {
+    if (!is_subclass_of($name, Command::class))
+    {
+      throw new RuntimeException("`$name` is not a valid command.");
+    }
+
+    if ($quiet)
+    {
+      try
+      {
+        ob_start();
+        (new $name(count($args) + 1, array_merge([$name], $args)))->call();
+      }
+      catch (Exception $ex)
+      {
+        ob_end_clean();
+        throw $ex;
+      }
+      ob_end_clean();
+    }
+    else
+    {
+      (new $name(count($args) + 1, array_merge([$name], $args)))->call();
+    }
+  }
+
   protected function displayError(string $message): int
   {
     file_put_contents('php://stderr', $message);
     return 1;
   }
 
-  protected function displayException(\Exception $ex): int
+  protected function displayException(Exception $ex): int
   {
     return $this->displayError($ex->getMessage());
   }
