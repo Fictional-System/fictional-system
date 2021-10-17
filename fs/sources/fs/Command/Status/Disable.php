@@ -6,7 +6,7 @@ class Disable extends SwitchStatus
 {
   public static function getShortDescription(): string
   {
-    return "Disable a domain, component or command.";
+    return 'Disable a domain, component or command.';
   }
 
   public static function getDescription(): array
@@ -16,18 +16,18 @@ class Disable extends SwitchStatus
 
   public static function getUsage(): array
   {
-    return ["fs disable [domain[/component[/command]]]"];
+    return ['fs disable [domain[/component[/command]]]'];
   }
 
   public static function getExamples(): array
   {
     return [
-      "fs disable all",
-      "fs disable foo",
-      "fs disable foo/bar",
-      "fs disable foo/bar/test",
-      "fs disable foo/bar/test bar/foo/test",
-      "fs disable foo/bar/foo foo/bar/bar",
+      'fs disable all',
+      'fs disable foo',
+      'fs disable foo/bar',
+      'fs disable foo/bar/test',
+      'fs disable foo/bar/test bar/foo/test',
+      'fs disable foo/bar/foo foo/bar/bar',
     ];
   }
 

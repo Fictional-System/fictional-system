@@ -6,7 +6,7 @@ class Enable extends SwitchStatus
 {
   public static function getShortDescription(): string
   {
-    return "Enable a domain, component or command.";
+    return 'Enable a domain, component or command.';
   }
 
   public static function getDescription(): array
@@ -16,18 +16,18 @@ class Enable extends SwitchStatus
 
   public static function getUsage(): array
   {
-    return ["fs enable [domain[/component[/command]]]"];
+    return ['fs enable [domain[/component[/command]]]'];
   }
 
   public static function getExamples(): array
   {
     return [
-      "fs enable all",
-      "fs enable foo",
-      "fs enable foo/bar",
-      "fs enable foo/bar/test",
-      "fs enable foo/bar/test bar/foo/test",
-      "fs enable foo/bar/foo foo/bar/bar",
+      'fs enable all',
+      'fs enable foo',
+      'fs enable foo/bar',
+      'fs enable foo/bar/test',
+      'fs enable foo/bar/test bar/foo/test',
+      'fs enable foo/bar/foo foo/bar/bar',
     ];
   }
 
