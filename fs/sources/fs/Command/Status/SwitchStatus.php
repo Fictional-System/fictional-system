@@ -37,7 +37,7 @@ abstract class SwitchStatus extends Command
 
   private function switchDomain(bool $enable, string $domain, string $component = null, string $command = null): void
   {
-    if ($component === null)
+    if (($component === null) && is_dir("$this->cwd/$domain"))
     {
       foreach (scandir("$this->cwd/$domain") as $dir)
       {
@@ -51,6 +51,10 @@ abstract class SwitchStatus extends Command
         }
       }
     }
+    else if (!is_dir("$this->cwd/$domain"))
+    {
+      throw new RuntimeException("Domain `$domain` does not exist.");
+    }
     else
     {
       $this->switchComponent($enable, $domain, $component, $command);
@@ -59,7 +63,7 @@ abstract class SwitchStatus extends Command
 
   private function switchComponent(bool $enable, string $domain, string $component, string $command = null): void
   {
-    if ($command === null)
+    if (($command === null) && is_dir("$this->cwd/$domain/$component"))
     {
       $config = new Config("$this->cwd/$domain/$component/commands.json");
       foreach ($config as $key => $value)
@@ -71,6 +75,10 @@ abstract class SwitchStatus extends Command
         $this->switchCommand($enable, $domain, $component, $key);
       }
     }
+    else if (!is_dir("$this->cwd/$domain/$component"))
+    {
+      throw new RuntimeException("Component `$domain/$component` does not exist.");
+    }
     else
     {
       $this->switchCommand($enable, $domain, $component, $command);
@@ -79,10 +87,15 @@ abstract class SwitchStatus extends Command
 
   private function switchCommand(bool $enable, string $domain, string $component, string $command): void
   {
+    if ($command === 'default')
+    {
+      throw new RuntimeException("Command `$domain/$component/default` does not exist.");
+    }
+
     $config = new Config("$this->cwd/$domain/$component/commands.json");
     if (!$config->offsetExists($command))
     {
-      throw new RuntimeException('Cannot ' . ($enable ? 'en' : 'dis') . 'able `$domain/$component/$command`');
+      throw new RuntimeException("Command `$domain/$component/$command` does not exist.");
     }
 
     $config->switchStatus($command, $enable)->save();
