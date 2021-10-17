@@ -29,12 +29,7 @@ Tester::it('Disable command', function (ITest $tester): void {
 });
 
 Tester::it('Enable all commands', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/bar')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/bar')->getReturn(), 0);
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar')->getReturn(), 0);
   $cr = $tester->run('enable all');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -58,12 +53,7 @@ Tester::it('Enable all commands', function (ITest $tester): void {
 });
 
 Tester::it('Enable multiple commands', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/bar')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create bar/foo/bar')->getReturn(), 0);
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar')->getReturn(), 0);
   $cr = $tester->run('enable foo/bar/test foo/bar/bar bar/foo/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -87,9 +77,7 @@ Tester::it('Enable multiple commands', function (ITest $tester): void {
 });
 
 Tester::it('Enable component', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/bar')->getReturn(), 0);
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar')->getReturn(), 0);
   $cr = $tester->run('enable foo/bar');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -107,12 +95,7 @@ Tester::it('Enable component', function (ITest $tester): void {
 });
 
 Tester::it('Enable domain', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/bar/bar')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/foo/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/foo/foo')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('create foo/foo/bar')->getReturn(), 0);
+  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar foo/foo/test foo/foo/foo foo/foo/bar')->getReturn(), 0);
   $cr = $tester->run('enable foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -133,4 +116,40 @@ Tester::it('Enable domain', function (ITest $tester): void {
   $tester->assertFileContent('foo/foo/commands.json',
     json_encode(array_merge(getCommandTemplate('default'), $testTemplate),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+});
+
+Tester::it('Enable non existent all', function (ITest $tester): void {
+  $cr = $tester->run('enable all');
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), '');
+
+  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $cr = $tester->run('enable all');
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), '');
+
+  $tester->assertEqualStrict($tester->run('create foo/bar')->getReturn(), 0);
+  $cr = $tester->run('enable all');
+  $tester->assertEqualStrict($cr->getReturn(), 0);
+  $tester->assertEqualStrict($cr->getOutputString(), '');
+});
+
+Tester::it('Enable non existent domain', function (ITest $tester): void {
+  $cr = $tester->run('enable foo');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Domain `foo` does not exist.');
+});
+
+Tester::it('Enable non existent component', function (ITest $tester): void {
+  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $cr = $tester->run('enable foo/bar');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` does not exist.');
+});
+
+Tester::it('Enable non existent command', function (ITest $tester): void {
+  $tester->assertEqualStrict($tester->run('create foo/bar')->getReturn(), 0);
+  $cr = $tester->run('enable foo/bar/test');
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` does not exist.');
 });
