@@ -10,7 +10,7 @@ class Create extends Command
 {
   public static function getShortDescription(): string
   {
-    return "Create a domain, component or command.";
+    return 'Create a domain, component or command.';
   }
 
   public static function getDescription(): array
@@ -20,16 +20,16 @@ class Create extends Command
 
   public static function getUsage(): array
   {
-    return ["fs create [domain[/component[/command]]]"];
+    return ['fs create [domain[/component[/command]]]'];
   }
 
   public static function getExamples(): array
   {
     return [
-      "fs create foo",
-      "fs create foo/bar",
-      "fs create foo/bar/test",
-      "fs create foo/bar/test bar/foo/test",
+      'fs create foo',
+      'fs create foo/bar',
+      'fs create foo/bar/test',
+      'fs create foo/bar/test bar/foo/test',
     ];
   }
 
