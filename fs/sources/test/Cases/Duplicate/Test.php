@@ -48,6 +48,14 @@ Tester::it('Duplicate unknown command', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` does not exist.');
 });
 
+Tester::it('Duplicate unknown command bis', function (ITest $tester) {
+  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` does not exist.');
+});
+
 Tester::it('Duplicate unknown component', function (ITest $tester) {
   $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
   $cr = $tester->run('duplicate foo/bar foo/foo');
