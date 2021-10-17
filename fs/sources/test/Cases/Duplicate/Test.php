@@ -122,3 +122,16 @@ Tester::it('Duplicate already exist domain', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getReturn(), 1);
   $tester->assertEqualStrict($cr->getOutputString(), 'Domain `bar` already exist.');
 });
+
+Tester::it('Duplicate members level error', function (ITest $tester) {
+  $cr = $tester->run('duplicate foo/bar bar');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Each member must have the same level.');
+});
+Tester::it('Duplicate unknown level', function (ITest $tester) {
+  $cr = $tester->run('duplicate foo/bar/foo/bar foo/bar/foo/bar');
+
+  $tester->assertEqualStrict($cr->getReturn(), 1);
+  $tester->assertEqualStrict($cr->getOutputString(), 'Unknown level.');
+});
