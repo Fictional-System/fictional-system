@@ -99,6 +99,21 @@ class Config extends ArrayObject
     return array_keys($this['commands']);
   }
 
+  public function getEnabledCommands(): array
+  {
+    $commands = [];
+
+    foreach ($this['commands'] as $key => $value)
+    {
+      if ($value['enabled'])
+      {
+        $commands[] = $key;
+      }
+    }
+
+    return $commands;
+  }
+
   public function hasCommand(string $name): bool
   {
     return key_exists($name, $this['commands']);

@@ -2,6 +2,7 @@
 
 namespace FS;
 
+use Command\Build\Build;
 use Command\Command;
 use Command\Create\Create;
 use Command\Duplicate\Duplicate;
@@ -15,6 +16,7 @@ class FS extends Command
    * @var Command[] $commands
    */
   private array $commands = [
+    'build' => Build::class,
     'create' => Create::class,
     'disable' => Disable::class,
     'duplicate' => Duplicate::class,
