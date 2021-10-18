@@ -4,30 +4,6 @@ use Samples\Template;
 use Tester\ITest;
 use Tester\Tester;
 
-function getCommandTemplate(string $name)
-{
-  return json_decode(str_replace('#command#', $name, json_encode([
-    '#command#' => [
-      'main' => [
-        'command' => '#command#',
-        'enabled' => false,
-        'versions' => ['latest'],
-        'from' => [],
-      ],
-      'options' => [
-        'volumes' => ['$PWD:/app'],
-        'ports' => [],
-        'interactive' => false,
-        'detached' => false,
-        'match-ids' => false,
-        'workdir' => '/app'
-      ],
-      'arguments' => [],
-      'env' => [],
-    ]
-  ])), true);
-}
-
 Tester::it('Create Domain', function (ITest $tester): void {
   $cr = $tester->run('create foo');
 
