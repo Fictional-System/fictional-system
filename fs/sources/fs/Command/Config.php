@@ -8,25 +8,36 @@ use RuntimeException;
 
 class Config extends ArrayObject
 {
+  private static int $version = 1;
+
   private static array $template = [
-    '#command#' => [
-      'main' => [
+    1 => [
+      'base' => [
+        'version' => 1,
+        'default' => [
+          'versions' => [
+            'latest' => [
+              'arguments' => [],
+              'env' => [],
+              'from' => [],
+            ],
+          ],
+          'arguments' => [],
+          'env' => [],
+          'volumes' => ['$PWD:/app'],
+          'ports' => [],
+          'interactive' => false,
+          'detached' => false,
+          'match-ids' => false,
+          'workdir' => '/app'
+        ],
+        'commands' => [],
+      ],
+      'command' => [
         'command' => '#command#',
         'enabled' => false,
-        'versions' => ['latest'],
-        'from' => [],
       ],
-      'options' => [
-        'volumes' => ['$PWD:/app'],
-        'ports' => [],
-        'interactive' => false,
-        'detached' => false,
-        'match-ids' => false,
-        'workdir' => '/app'
-      ],
-      'arguments' => [],
-      'env' => [],
-    ]
+    ],
   ];
 
   /**
@@ -50,6 +61,11 @@ class Config extends ArrayObject
     }
 
     parent::__construct(json_decode($content, true, 512, JSON_THROW_ON_ERROR));
+
+    if (self::$version > $this['version'])
+    {
+      // Migrate configuration;
+    }
   }
 
   public function save(): void
@@ -57,11 +73,35 @@ class Config extends ArrayObject
     self::write($this->path, $this->getArrayCopy());
   }
 
-  public function merge(array $array): Config
+  public function setCommand(string $name, array $data): Config
   {
-    $this->exchangeArray(array_merge($this->getArrayCopy(), $array));
-
+    $this['commands'][$name] = $data;
     return $this;
+  }
+
+  public function createCommand(string $name): Config
+  {
+    return $this->setCommand($name, Config::getTemplate($name));
+  }
+
+  public function getCommand(string $name): array
+  {
+    if (!key_exists($name, $this['commands']))
+    {
+      throw new RuntimeException("Command `$name` does not exist.");
+    }
+
+    return $this['commands'][$name];
+  }
+
+  public function getCommandNames(): array
+  {
+    return array_keys($this['commands']);
+  }
+
+  public function hasCommand(string $name): bool
+  {
+    return key_exists($name, $this['commands']);
   }
 
   public function enable(string $name): Config
@@ -76,7 +116,12 @@ class Config extends ArrayObject
 
   public function switchStatus(string $name, bool $status): Config
   {
-    $this[$name]['main']['enabled'] = $status;
+    if (!key_exists($name, $this['commands']))
+    {
+      throw new RuntimeException("Command `$name` does not exist.");
+    }
+
+    $this['commands'][$name]['enabled'] = $status;
     return $this;
   }
 
@@ -93,23 +138,16 @@ class Config extends ArrayObject
     }
   }
 
-  /**
-   * @param string[] $replacements
-   * @return array
-   */
-  public static function getTemplate(array $replacements): array
+  public static function getTemplate(string $name): array
   {
-    $template = json_encode(self::$template);
-    foreach ($replacements as $key => $value)
-    {
-      $template = str_replace("#$key#", $value, $template);
-    }
+    $template = self::$template[1]['command'];
+    $template['command'] = $name;
 
-    return json_decode($template, true);
+    return $template;
   }
 
-  public static function createTemplate(string $path, array $replacements = []): void
+  public static function createTemplate(string $path): void
   {
-    self::write($path, self::getTemplate(array_merge(['command' => 'default'], $replacements)));
+    self::write($path, self::$template[self::$version]['base']);
   }
 }

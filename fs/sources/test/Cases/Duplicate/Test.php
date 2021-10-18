@@ -1,5 +1,6 @@
 <?php
 
+use Samples\Template;
 use Tester\ITest;
 use Tester\Tester;
 
@@ -9,9 +10,7 @@ Tester::it('Duplicate command', function (ITest $tester) {
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` duplicate to `foo/bar/foo`.');
-  $tester->assertFileContent('foo/bar/commands.json',
-    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test'), ['foo' => getCommandTemplate('test')['test']]),
-      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+  $tester->assertFileContent('foo/bar/commands.json', Template::getTemplate(['test'])->addCommand('foo', 'test')->toJson());
 });
 
 Tester::it('Duplicate command bis', function (ITest $tester) {
@@ -22,9 +21,7 @@ Tester::it('Duplicate command bis', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` duplicate to `bar/foo/test`.');
   $tester->assertDirExist('bar/foo/files');
   $tester->assertFileExist('bar/foo/Containerfile');
-  $tester->assertFileContent('bar/foo/commands.json',
-    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
-      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+  $tester->assertFileContent('bar/foo/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Duplicate component', function (ITest $tester) {
@@ -35,9 +32,7 @@ Tester::it('Duplicate component', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` duplicate to `foo/foo`.');
   $tester->assertDirExist('foo/foo/files');
   $tester->assertFileExist('foo/foo/Containerfile');
-  $tester->assertFileContent('foo/foo/commands.json',
-    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
-      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+  $tester->assertFileContent('foo/foo/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Duplicate domain', function (ITest $tester) {
@@ -48,9 +43,7 @@ Tester::it('Duplicate domain', function (ITest $tester) {
   $tester->assertEqualStrict($cr->getOutputString(), 'Domain `foo` duplicate to `bar`.');
   $tester->assertDirExist('bar/bar/files');
   $tester->assertFileExist('bar/bar/Containerfile');
-  $tester->assertFileContent('bar/bar/commands.json',
-    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
-      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+  $tester->assertFileContent('bar/bar/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Duplicate unknown command', function (ITest $tester) {
@@ -94,9 +87,7 @@ Tester::it('Duplicate component with files', function (ITest $tester) {
   $tester->assertDirExist('foo/foo/files');
   $tester->assertFileExist('foo/foo/Containerfile');
   $tester->assertFileExist('foo/foo/files/foo');
-  $tester->assertFileContent('foo/foo/commands.json',
-    json_encode(array_merge(getCommandTemplate('default'), getCommandTemplate('test')),
-      JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+  $tester->assertFileContent('foo/foo/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Duplicate already exist command', function (ITest $tester) {

@@ -99,11 +99,11 @@ class Create extends Command
   {
     $config = new Config("$this->cwd/$domain/$component/commands.json");
 
-    if ($config->offsetExists($command))
+    if ($config->hasCommand($command))
     {
       throw new RuntimeException("Command `$domain/$component/$command` already exist.");
     }
-    $config->merge(Config::getTemplate(['command' => $command]))->save();
+    $config->createCommand($command)->save();
 
     echo "Command `$domain/$component/$command` has been created." . PHP_EOL;
   }

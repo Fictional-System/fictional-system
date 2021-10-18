@@ -22,4 +22,9 @@ class TestReturn
   {
     return $this->return;
   }
+
+  public function dump(): void
+  {
+    var_dump([$this->return, $this->getOutputString()]);
+  }
 }
