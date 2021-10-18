@@ -66,13 +66,9 @@ abstract class SwitchStatus extends Command
     if (($command === null) && is_dir("$this->cwd/$domain/$component"))
     {
       $config = new Config("$this->cwd/$domain/$component/commands.json");
-      foreach ($config as $key => $value)
+      foreach ($config->getCommandNames() as $name)
       {
-        if (in_array($key, ['default']))
-        {
-          continue;
-        }
-        $this->switchCommand($enable, $domain, $component, $key);
+        $this->switchCommand($enable, $domain, $component, $name);
       }
     }
     else if (!is_dir("$this->cwd/$domain/$component"))
@@ -87,13 +83,8 @@ abstract class SwitchStatus extends Command
 
   private function switchCommand(bool $enable, string $domain, string $component, string $command): void
   {
-    if ($command === 'default')
-    {
-      throw new RuntimeException("Command `$domain/$component/default` does not exist.");
-    }
-
     $config = new Config("$this->cwd/$domain/$component/commands.json");
-    if (!$config->offsetExists($command))
+    if (!$config->hasCommand($command))
     {
       throw new RuntimeException("Command `$domain/$component/$command` does not exist.");
     }

@@ -148,16 +148,16 @@ class Duplicate extends Command
     }
 
     $config = new Config("$this->cwd/${left[0]}/${left[1]}/commands.json");
-    if (!$config->offsetExists($left[2]))
+    if (!$config->hasCommand($left[2]))
     {
       throw new RuntimeException("Command `${left[0]}/${left[1]}/${left[2]}` does not exist.");
     }
-    if ($config->offsetExists($right[2]))
+    if ($config->hasCommand($right[2]))
     {
       throw new RuntimeException("Command `${right[0]}/${right[1]}/${right[2]}` already exist.");
     }
 
-    $config->merge([$right[2] => $config[$left[2]]])->save();
+    $config->setCommand($right[2], $config['commands'][$left[2]])->save();
     echo "Command `${left[0]}/${left[1]}/${left[2]}` duplicate to `${right[0]}/${right[1]}/${right[2]}`." . PHP_EOL;
   }
 
@@ -173,7 +173,7 @@ class Duplicate extends Command
     else
     {
       $rightFile = new Config("$this->cwd/${right[0]}/${right[1]}/commands.json");
-      if ($rightFile->offsetExists($right[2]))
+      if ($rightFile->hasCommand($right[2]))
       {
         throw new RuntimeException("Command `${right[0]}/${right[1]}/${right[2]}` already exist.");
       }
@@ -181,13 +181,12 @@ class Duplicate extends Command
 
     $leftFile = new Config("$this->cwd/${left[0]}/${left[1]}/commands.json");
     $rightFile = new Config("$this->cwd/${right[0]}/${right[1]}/commands.json");
-    if (!$leftFile->offsetExists($left[2]))
+    if (!$leftFile->hasCommand($left[2]))
     {
       throw new RuntimeException("Command `${left[0]}/${left[1]}/${left[2]}` does not exist.");
     }
 
-    $rightFile[$right[2]] = $leftFile[$left[2]];
-    $rightFile->save();
+    $rightFile->setCommand($right[2], $leftFile->getCommand($left[2]))->save();
     echo "Command `${left[0]}/${left[1]}/${left[2]}` duplicate to `${right[0]}/${right[1]}/${right[2]}`." . PHP_EOL;
   }
 }
