@@ -1,0 +1,24 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - main
+    - V*
+  pull_request:
+    branches:
+    - main
+    - V*
+    - feature/*
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build -t fs/test -f ./fs/fs/Containerfile ./fs/sources
+    - name: Run tests
+      run: docker run --rm -v ${PWD}/fs/sources/test:/fs/test:z fs/test php /fs/test/test.php
