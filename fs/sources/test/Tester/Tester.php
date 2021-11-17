@@ -81,11 +81,7 @@ class Tester
       {
         self::clean();
         $test->reset();
-        if (!$this->dev)
-          ob_start();
         $test->call($this->dev);
-        if (!$this->dev)
-          ob_end_clean();
       }
       catch (\Exception $e)
       {
@@ -115,6 +111,7 @@ class Tester
     if (count($failedTests) === 0)
     {
       echo 'All tests done.' . PHP_EOL;
+      $this->debugOutput();
       return 0;
     }
 
@@ -128,8 +125,28 @@ class Tester
       }
     }
 
+    $this->debugOutput();
     echo PHP_EOL;
 
     return 1;
+  }
+
+  private function debugOutput(): void
+  {
+    if ($this->dev)
+    {
+      echo PHP_EOL . 'Debug output :' . PHP_EOL;
+      foreach (self::$tests as $test)
+      {
+        if (!strlen($test->getOutput()))
+        {
+          continue;
+        }
+        echo str_repeat('#', strlen($test->getName()) + 4) . PHP_EOL;
+        echo '# ' . $test->getName() . ' #' . PHP_EOL;
+        echo str_repeat('#', strlen($test->getName()) + 4) . PHP_EOL;
+        echo $test->getOutput() . PHP_EOL;
+      }
+    }
   }
 }

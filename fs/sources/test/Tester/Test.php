@@ -5,6 +5,7 @@ namespace Tester;
 class Test implements ITest
 {
   private array $errors = [];
+  private string $output = "";
   private bool $dev = false;
 
   public function __construct(private string $name, private $cb)
@@ -42,10 +43,18 @@ class Test implements ITest
     }, $this->errors);
   }
 
+  public function getOutput(): string
+  {
+    return $this->output;
+  }
+
   public function call(bool $dev = false): mixed
   {
     $this->dev = $dev;
-    return call_user_func_array($this->cb, [$this]);
+    ob_start();
+    $ret = call_user_func_array($this->cb, [$this]);
+    $this->output = ob_get_clean();
+    return $ret;
   }
 
   public function run(...$args): TestReturn
