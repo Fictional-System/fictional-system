@@ -17,8 +17,6 @@ class Config extends ArrayObject
         'default' => [
           'versions' => [
             'latest' => [
-              'arguments' => [],
-              'env' => [],
               'from' => [],
             ],
           ],
@@ -164,5 +162,39 @@ class Config extends ArrayObject
   public static function createTemplate(string $path): void
   {
     self::write($path, self::$template[self::$version]['base']);
+  }
+
+  /**
+   * @return string[]
+   */
+  public function getVersions(string $cmd): array
+  {
+    if (!key_exists($cmd, $this['commands']))
+    {
+      throw new RuntimeException("Command `$cmd` not found.");
+    }
+
+    $defaultVersions = array_keys($this['default']['versions']);
+    $commandVersions = key_exists('versions', $this['commands'][$cmd]) ? array_keys($this['commands'][$cmd]['versions']) : [];
+
+    return array_merge($defaultVersions, $commandVersions);
+  }
+
+  public function getVersionConfig(string $cmd, string $version): array
+  {
+    if (!in_array($version, $this->getVersions($cmd)))
+    {
+      throw new RuntimeException("Version `$version` not found for command `$cmd`.");
+    }
+
+    $config = $this['default'];
+    $config = array_merge($config, $this['commands'][$cmd], $config['versions'][$version]);
+    if (key_exists('versions', $this['commands'][$cmd]) && key_exists($version, $this['commands'][$cmd]['versions']))
+    {
+      $config = array_merge($config, $this['commands'][$cmd]['versions'][$version]);
+    }
+    unset($config['versions'], $config['enabled'], $config['command']);
+
+    return $config;
   }
 }

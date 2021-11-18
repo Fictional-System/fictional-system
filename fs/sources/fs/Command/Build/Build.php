@@ -30,22 +30,19 @@ class Build extends Command
 
   public function call(): void
   {
-    foreach ($this->getAllEnabledCommands() as $path => $commands)
-    {
-      foreach ($commands as $command)
-      {
-        var_dump(["$path/$command"]);
-      }
-    }
+    $this->build($this->checkDependencies($this->getAllCommands()));
   }
 
-  private function getAllEnabledCommands(): array
+  /**
+   * @return Config[]
+   */
+  private function getAllCommands(): array
   {
     $list = [];
 
     foreach (scandir($this->cwd) as $domain)
     {
-      if (in_array($domain, ['.', '..', '.git', 'bin', 'fs']))
+      if (in_array($domain, ['.', '..', '.git', '.github', 'bin', 'fs']))
       {
         continue;
       }
@@ -60,12 +57,48 @@ class Build extends Command
           if (is_dir("$this->cwd/$domain/$component"))
           {
             $config = new Config("$this->cwd/$domain/$component/commands.json");
-            $list["$domain/$component"] = $config->getEnabledCommands();
+
+            foreach ($config->getEnabledCommands() as $command)
+            {
+              foreach ($config->getVersions($command) as $version)
+              {
+                $list["$domain/$component/$command:$version"] = $config->getVersionConfig($command, $version);
+              }
+            }
           }
         }
       }
     }
 
     return $list;
+  }
+
+  private function checkDependencies(array $list): array
+  {
+    return $list;
+  }
+
+  private function build(array $list): void
+  {
+    $buildFile = '';
+    foreach ($list as $command => $config)
+    {
+      $name = explode(':', $command)[0];
+      $version = explode(':', $command)[1];
+      $context = implode('/', array_slice(explode('/', $name), 0, 2));
+
+      $buildFile .= "name=$name" . PHP_EOL;
+      $buildFile .= "version=$version" . PHP_EOL;
+      $buildFile .= "context=$context" . PHP_EOL;
+
+      foreach ($config['arguments'] as $argument => $value)
+      {
+        $buildFile .= "argument=$argument:$value" . PHP_EOL;
+      }
+      $buildFile .= 'build' . PHP_EOL;
+    }
+
+    echo count(array_keys($list)) . ' commands to build.' . PHP_EOL;
+    file_put_contents('build.cache', $buildFile, LOCK_EX);
   }
 }

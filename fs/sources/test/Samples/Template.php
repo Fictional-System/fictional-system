@@ -14,8 +14,6 @@ class Template extends ArrayObject
         'default' => [
           'versions' => [
             'latest' => [
-              'arguments' => [],
-              'env' => [],
               'from' => [],
             ],
           ],
