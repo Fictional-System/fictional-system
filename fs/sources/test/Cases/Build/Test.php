@@ -5,22 +5,18 @@ use Tester\ITest;
 use Tester\Tester;
 
 Tester::it('Nothing to build', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
 
-  $cr = $tester->run('build');
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), '0 commands to build.');
+  $tester->assertRun('build', 0, '0 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache', '');
 });
 
 Tester::it('Simple build', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('enable foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
 
-  $cr = $tester->run('build');
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), '1 commands to build.');
+  $tester->assertRun('build', 0, '1 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
     'name=foo/bar/test' . PHP_EOL .
@@ -30,16 +26,14 @@ Tester::it('Simple build', function (ITest $tester): void {
 });
 
 Tester::it('Complete build', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('enable foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
 
   $config = new Config('foo/bar/commands.json');
   $config['default']['arguments']['argument'] = 'value';
   $config->save();
 
-  $cr = $tester->run('build');
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), '1 commands to build.');
+  $tester->assertRun('build', 0, '1 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
     'name=foo/bar/test' . PHP_EOL .

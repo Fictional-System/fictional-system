@@ -5,7 +5,7 @@ use Tester\ITest;
 use Tester\Tester;
 
 Tester::it('Duplicate command', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -14,7 +14,7 @@ Tester::it('Duplicate command', function (ITest $tester) {
 });
 
 Tester::it('Duplicate command bis', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   $cr = $tester->run('duplicate foo/bar/test bar/foo/test');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -25,7 +25,7 @@ Tester::it('Duplicate command bis', function (ITest $tester) {
 });
 
 Tester::it('Duplicate component', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   $cr = $tester->run('duplicate foo/bar foo/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -36,7 +36,7 @@ Tester::it('Duplicate component', function (ITest $tester) {
 });
 
 Tester::it('Duplicate domain', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   $cr = $tester->run('duplicate foo bar');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -47,7 +47,7 @@ Tester::it('Duplicate domain', function (ITest $tester) {
 });
 
 Tester::it('Duplicate unknown command', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar');
   $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -55,7 +55,7 @@ Tester::it('Duplicate unknown command', function (ITest $tester) {
 });
 
 Tester::it('Duplicate unknown command bis', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $tester->shadowRun('create foo');
   $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -63,7 +63,7 @@ Tester::it('Duplicate unknown command bis', function (ITest $tester) {
 });
 
 Tester::it('Duplicate unknown component', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $tester->shadowRun('create foo');
   $cr = $tester->run('duplicate foo/bar foo/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -78,7 +78,7 @@ Tester::it('Duplicate unknown domain', function (ITest $tester) {
 });
 
 Tester::it('Duplicate component with files', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   file_put_contents('foo/bar/files/foo', 'bar');
   $cr = $tester->run('duplicate foo/bar foo/foo');
 
@@ -91,7 +91,7 @@ Tester::it('Duplicate component with files', function (ITest $tester) {
 });
 
 Tester::it('Duplicate already exist command', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/bar/foo');
   $cr = $tester->run('duplicate foo/bar/test foo/bar/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -99,7 +99,7 @@ Tester::it('Duplicate already exist command', function (ITest $tester) {
 });
 
 Tester::it('Duplicate already exist command bis', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/foo/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/foo/test');
   $cr = $tester->run('duplicate foo/bar/test foo/foo/test');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -107,7 +107,7 @@ Tester::it('Duplicate already exist command bis', function (ITest $tester) {
 });
 
 Tester::it('Duplicate already exist component', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo/bar foo/foo')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar foo/foo');
   $cr = $tester->run('duplicate foo/bar foo/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);
@@ -115,7 +115,7 @@ Tester::it('Duplicate already exist component', function (ITest $tester) {
 });
 
 Tester::it('Duplicate already exist domain', function (ITest $tester) {
-  $tester->assertEqualStrict($tester->run('create foo bar')->getReturn(), 0);
+  $tester->shadowRun('create foo bar');
   $cr = $tester->run('duplicate foo bar');
 
   $tester->assertEqualStrict($cr->getReturn(), 1);

@@ -64,6 +64,14 @@ class Test implements ITest
     return new TestReturn($output, $return);
   }
 
+  public function shadowRun(...$args): void
+  {
+    if ($this->run(...$args)->getReturn() !== 0)
+    {
+      $this->addError();
+    }
+  }
+
   private function addError(): void
   {
     $debug = debug_backtrace();
@@ -147,9 +155,9 @@ class Test implements ITest
     }
   }
 
-  public function assertRun(array $args, int $return, string $output): void
+  public function assertRun(string $args, int $return, string $output): void
   {
-    $cr = $this->run(...$args);
+    $cr = $this->run($args);
 
     if ($cr->getReturn() !== $return)
     {

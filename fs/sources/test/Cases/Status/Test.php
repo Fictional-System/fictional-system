@@ -5,7 +5,7 @@ use Tester\ITest;
 use Tester\Tester;
 
 Tester::it('Enable command', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
   $cr = $tester->run('enable foo/bar/test');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -14,8 +14,8 @@ Tester::it('Enable command', function (ITest $tester): void {
 });
 
 Tester::it('Disable command', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test')->getReturn(), 0);
-  $tester->assertEqualStrict($tester->run('enable foo/bar/test')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
   $cr = $tester->run('disable foo/bar/test');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -24,7 +24,7 @@ Tester::it('Disable command', function (ITest $tester): void {
 });
 
 Tester::it('Enable all commands', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar');
   $cr = $tester->run('enable all');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -43,7 +43,7 @@ Tester::it('Enable all commands', function (ITest $tester): void {
 });
 
 Tester::it('Enable multiple commands', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar bar/foo/test bar/foo/foo bar/foo/bar');
   $cr = $tester->run('enable foo/bar/test foo/bar/bar bar/foo/foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -63,7 +63,7 @@ Tester::it('Enable multiple commands', function (ITest $tester): void {
 });
 
 Tester::it('Enable component', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar');
   $cr = $tester->run('enable foo/bar');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -78,7 +78,7 @@ Tester::it('Enable component', function (ITest $tester): void {
 });
 
 Tester::it('Enable domain', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar/test foo/bar/foo foo/bar/bar foo/foo/test foo/foo/foo foo/foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar foo/foo/test foo/foo/foo foo/foo/bar');
   $cr = $tester->run('enable foo');
 
   $tester->assertEqualStrict($cr->getReturn(), 0);
@@ -101,12 +101,12 @@ Tester::it('Enable non existent all', function (ITest $tester): void {
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), '');
 
-  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $tester->shadowRun('create foo');
   $cr = $tester->run('enable all');
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), '');
 
-  $tester->assertEqualStrict($tester->run('create foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar');
   $cr = $tester->run('enable all');
   $tester->assertEqualStrict($cr->getReturn(), 0);
   $tester->assertEqualStrict($cr->getOutputString(), '');
@@ -119,14 +119,14 @@ Tester::it('Enable non existent domain', function (ITest $tester): void {
 });
 
 Tester::it('Enable non existent component', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo')->getReturn(), 0);
+  $tester->shadowRun('create foo');
   $cr = $tester->run('enable foo/bar');
   $tester->assertEqualStrict($cr->getReturn(), 1);
   $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` does not exist.');
 });
 
 Tester::it('Enable non existent command', function (ITest $tester): void {
-  $tester->assertEqualStrict($tester->run('create foo/bar')->getReturn(), 0);
+  $tester->shadowRun('create foo/bar');
   $cr = $tester->run('enable foo/bar/test');
   $tester->assertEqualStrict($cr->getReturn(), 1);
   $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` does not exist.');

@@ -6,6 +6,8 @@ interface ITest
 {
   public function run(...$args): TestReturn;
 
+  public function shadowRun(...$args): void;
+
   public function assertFail(): void;
 
   public function assertTrue(mixed $value): void;
@@ -26,5 +28,5 @@ interface ITest
 
   public function assertFileContent(string $path, string $content): void;
 
-  public function assertRun(array $args, int $return, string $output): void;
+  public function assertRun(string $args, int $return, string $output): void;
 }
