@@ -25,4 +25,6 @@ interface ITest
   public function assertDirExist(string $path): void;
 
   public function assertFileContent(string $path, string $content): void;
+
+  public function assertRun(array $args, int $return, string $output): void;
 }

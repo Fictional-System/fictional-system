@@ -146,4 +146,19 @@ class Test implements ITest
       $this->addError();
     }
   }
+
+  public function assertRun(array $args, int $return, string $output): void
+  {
+    $cr = $this->run(...$args);
+
+    if ($cr->getReturn() !== $return)
+    {
+      $this->addError();
+    }
+
+    if ($cr->getOutputString() !== $output)
+    {
+      $this->addError();
+    }
+  }
 }
