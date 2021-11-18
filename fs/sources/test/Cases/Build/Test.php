@@ -68,3 +68,65 @@ Tester::it('Multiple build', function (ITest $tester): void {
     'argument=argument:value' . PHP_EOL .
     'build' . PHP_EOL);
 });
+
+Tester::it('Multiple build override arguments', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/test foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['arguments']['argument'] = 'default';
+  $config['default']['versions']['before'] = [
+    'arguments' => [
+      'argument' => 'default-version'
+    ]
+  ];
+  $config['commands']['foo']['arguments'] = [
+    'argument' => 'foo'
+  ];
+  $config['commands']['foo']['versions'] = [
+    'before' => [
+      'arguments' => [
+        'argument' => 'foo-version'
+      ]
+    ]
+  ];
+  $config['commands']['bar']['arguments'] = [];
+  $config['commands']['bar']['versions'] = [
+    'before' => [
+      'arguments' => []
+    ]
+  ];
+  $config->save();
+
+  $tester->assertRun('build', 0, '6 commands to build.', true);
+  $tester->assertFileExist('build.cache');
+  $tester->assertFileContent('build.cache',
+    'name=foo/bar/test' . PHP_EOL .
+    'version=latest' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'argument=argument:default' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/test' . PHP_EOL .
+    'version=before' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'argument=argument:default-version' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/foo' . PHP_EOL .
+    'version=latest' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'argument=argument:foo' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/foo' . PHP_EOL .
+    'version=before' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'argument=argument:foo-version' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/bar' . PHP_EOL .
+    'version=latest' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/bar' . PHP_EOL .
+    'version=before' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'build' . PHP_EOL);
+});
