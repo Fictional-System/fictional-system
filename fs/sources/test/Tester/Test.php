@@ -155,9 +155,14 @@ class Test implements ITest
     }
   }
 
-  public function assertRun(string $args, int $return, string $output): void
+  public function assertRun(string $args, int $return, string $output, bool $debugOutput = false): void
   {
     $cr = $this->run($args);
+
+    if ($debugOutput)
+    {
+      $cr->dump();
+    }
 
     if ($cr->getReturn() !== $return)
     {
