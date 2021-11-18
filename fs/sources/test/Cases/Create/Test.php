@@ -5,58 +5,40 @@ use Tester\ITest;
 use Tester\Tester;
 
 Tester::it('Create Domain', function (ITest $tester): void {
-  $cr = $tester->run('create foo');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Domain `foo` has been created.');
+  $tester->assertRun('create foo', 0, 'Domain `foo` has been created.');
   $tester->assertDirExist('foo');
 });
 
 Tester::it('Create Component', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` has been created.');
+  $tester->assertRun('create foo/bar', 0, 'Component `foo/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate());
 });
 
 Tester::it('Create Command', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar/test');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
+  $tester->assertRun('create foo/bar/test', 0, 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Create full', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar/test');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
+  $tester->assertRun('create foo/bar/test', 0, 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate(['test']));
 });
 
 Tester::it('Create multiple commands', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar/foo foo/bar/bar');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/foo` has been created.' . PHP_EOL . 'Command `foo/bar/bar` has been created.');
+  $tester->assertRun('create foo/bar/foo foo/bar/bar', 0, 'Command `foo/bar/foo` has been created.' . PHP_EOL . 'Command `foo/bar/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate(['foo', 'bar']));
 });
 
 Tester::it('Create commands full', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar/test bar/foo/test');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.' . PHP_EOL . 'Command `bar/foo/test` has been created.');
+  $tester->assertRun('create foo/bar/test bar/foo/test', 0, 'Command `foo/bar/test` has been created.' . PHP_EOL . 'Command `bar/foo/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertDirExist('bar/foo/files');
@@ -66,41 +48,23 @@ Tester::it('Create commands full', function (ITest $tester): void {
 });
 
 Tester::it('Create Domain Already Exist', function (ITest $tester): void {
-  $cr = $tester->run('create foo');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Domain `foo` has been created.');
+  $tester->assertRun('create foo', 0, 'Domain `foo` has been created.');
   $tester->assertDirExist('foo');
-
-  $cr = $tester->run('create foo');
-  $tester->assertEqualStrict($cr->getReturn(), 1);
-  $tester->assertEqualStrict($cr->getOutputString(), '`/app/foo` already exist.');
+  $tester->assertRun('create foo', 1, '`/app/foo` already exist.');
 });
 
 Tester::it('Create Component Already Exist', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Component `foo/bar` has been created.');
+  $tester->assertRun('create foo/bar', 0, 'Component `foo/bar` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate([]));
-
-  $cr = $tester->run('create foo/bar');
-  $tester->assertEqualStrict($cr->getReturn(), 1);
-  $tester->assertEqualStrict($cr->getOutputString(), '`/app/foo/bar` already exist.');
+  $tester->assertRun('create foo/bar', 1, '`/app/foo/bar` already exist.');
 });
 
 Tester::it('Create Command Already Exist', function (ITest $tester): void {
-  $cr = $tester->run('create foo/bar/test');
-
-  $tester->assertEqualStrict($cr->getReturn(), 0);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` has been created.');
+  $tester->assertRun('create foo/bar/test', 0, 'Command `foo/bar/test` has been created.');
   $tester->assertDirExist('foo/bar/files');
   $tester->assertFileExist('foo/bar/Containerfile');
   $tester->assertFileContent('foo/bar/commands.json', Template::getJsonTemplate(['test']));
-
-  $cr = $tester->run('create foo/bar/test');
-  $tester->assertEqualStrict($cr->getReturn(), 1);
-  $tester->assertEqualStrict($cr->getOutputString(), 'Command `foo/bar/test` already exist.');
+  $tester->assertRun('create foo/bar/test', 1, 'Command `foo/bar/test` already exist.');
 });

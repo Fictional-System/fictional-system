@@ -4,8 +4,6 @@ namespace Tester;
 
 interface ITest
 {
-  public function run(...$args): TestReturn;
-
   public function shadowRun(...$args): void;
 
   public function assertFail(): void;

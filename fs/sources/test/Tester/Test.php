@@ -57,7 +57,7 @@ class Test implements ITest
     return $ret;
   }
 
-  public function run(...$args): TestReturn
+  private function run(...$args): TestReturn
   {
     exec(($this->dev ? 'php /fs/fs/run.php ' : 'php /usr/local/bin/fs.phar ') . implode(' ', $args) . ' 2>&1', $output, $return);
 
