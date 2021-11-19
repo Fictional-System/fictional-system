@@ -98,7 +98,7 @@ Tester::it('Multiple build override arguments', function (ITest $tester): void {
   ];
   $config->save();
 
-  $tester->assertRun('build', 0, '6 commands to build.', true);
+  $tester->assertRun('build', 0, '6 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
     'name=foo/bar/test' . PHP_EOL .
