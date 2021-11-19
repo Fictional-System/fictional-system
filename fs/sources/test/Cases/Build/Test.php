@@ -130,3 +130,24 @@ Tester::it('Multiple build override arguments', function (ITest $tester): void {
     'context=foo/bar' . PHP_EOL .
     'build' . PHP_EOL);
 });
+
+Tester::it('Simple dependency', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['commands']['foo']['versions']['latest']['from']= ['foo/bar/bar'];
+  $config->save();
+
+  $tester->assertRun('build', 0, '2 commands to build.');
+  $tester->assertFileExist('build.cache');
+  $tester->assertFileContent('build.cache',
+    'name=foo/bar/bar' . PHP_EOL .
+    'version=latest' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'build' . PHP_EOL .
+    'name=foo/bar/foo' . PHP_EOL .
+    'version=latest' . PHP_EOL .
+    'context=foo/bar' . PHP_EOL .
+    'build' . PHP_EOL);
+});
