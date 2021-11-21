@@ -118,7 +118,7 @@ class Duplicate extends Command
     }
     else
     {
-      if (!mkdir($to, 0755))
+      if (!mkdir($to, 0700))
       {
         throw new RuntimeException("Unable to copy `$from` to `$to`.");
       }

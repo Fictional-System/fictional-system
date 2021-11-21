@@ -123,7 +123,7 @@ class Create extends Command
       }
     }
 
-    if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0755))
+    if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0700))
     {
       throw new RuntimeException("Unable to create `$dir`");
     }
