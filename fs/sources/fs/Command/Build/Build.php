@@ -101,7 +101,7 @@ class Build extends Command
 
         if (in_array($fullname, $depList))
         {
-          throw new RuntimeException("Circular dependency detected in `$command`.");
+          throw new RuntimeException("Circular dependency detected in `$fullname`.");
         }
 
         if (!key_exists($fullname, $list))
