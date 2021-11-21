@@ -28,16 +28,16 @@ Tester::it('Simple build', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    "foo/bar/test:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/test:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ]
   ]));
 });
@@ -60,16 +60,16 @@ Tester::it('Complete build', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    "foo/bar/test:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/test:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ]
   ]));
 });
@@ -100,37 +100,37 @@ Tester::it('Multiple build', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson(["foo/bar/test:latest" => [
-    "env" => [],
-    "volumes" => [
-      "\$PWD:/app"
+    'env' => [],
+    'volumes' => [
+      '\$PWD:/app'
     ],
-    "ports" => [],
-    "interactive" => false,
-    "detached" => false,
-    "match-ids" => false,
-    "workdir" => "/app"
+    'ports' => [],
+    'interactive' => false,
+    'detached' => false,
+    'match-ids' => false,
+    'workdir' => '/app'
   ],
-    "foo/bar/foo:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/foo:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "test/bar/bar:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'test/bar/bar:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ]
   ]));
 });
@@ -196,71 +196,71 @@ Tester::it('Multiple build override arguments', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    "foo/bar/test:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/test:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "foo/bar/test:before" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/test:before' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "foo/bar/foo:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/foo:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "foo/bar/foo:before" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/foo:before' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "foo/bar/bar:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/bar:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ],
-    "foo/bar/bar:before" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/bar:before' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app"
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app'
     ]
   ]));
 });
@@ -286,27 +286,27 @@ Tester::it('Simple dependency', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    "foo/bar/foo:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/foo:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app",
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ],
-    "foo/bar/bar:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/bar:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app",
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ]
   ]));
 });
@@ -337,38 +337,38 @@ Tester::it('Multi Level dependency', function (ITest $tester): void {
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    "foo/bar/foo:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/foo:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app",
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ],
-    "foo/bar/bar:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/bar:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app",
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ],
-    "foo/bar/test:latest" => [
-      "env" => [],
-      "volumes" => [
-        "\$PWD:/app"
+    'foo/bar/test:latest' => [
+      'env' => [],
+      'volumes' => [
+        '\$PWD:/app'
       ],
-      "ports" => [],
-      "interactive" => false,
-      "detached" => false,
-      "match-ids" => false,
-      "workdir" => "/app",
+      'ports' => [],
+      'interactive' => false,
+      'detached' => false,
+      'match-ids' => false,
+      'workdir' => '/app',
     ]
   ]));
 });
