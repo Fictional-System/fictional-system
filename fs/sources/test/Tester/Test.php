@@ -167,6 +167,7 @@ class Test implements ITest
     if ($cr->getReturn() !== $return)
     {
       $this->addError();
+      return;
     }
 
     if ($cr->getOutputString() !== $output)
