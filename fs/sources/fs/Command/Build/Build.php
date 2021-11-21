@@ -4,6 +4,7 @@ namespace Command\Build;
 
 use Command\Command;
 use Command\Config;
+use RuntimeException;
 
 class Build extends Command
 {
@@ -75,30 +76,157 @@ class Build extends Command
 
   private function checkDependencies(array $list): array
   {
+    $depList = [];
+
+    foreach ($list as $command => $config)
+    {
+      if (in_array($command, $depList))
+      {
+        continue;
+      }
+      $depList[] = $command;
+      if (!key_exists('from', $config))
+      {
+        continue;
+      }
+      $deps = $config['from'];
+      while (count($deps))
+      {
+        $dep = array_shift($deps);
+        if (!$this->checkFormat($dep))
+        {
+          throw new RuntimeException("Dependency `$dep` in `$command` is not a valid dependency.");
+        }
+        $fullname = $this->getDepencyFullname($dep, $command);
+
+        if (in_array($fullname, $depList))
+        {
+          throw new RuntimeException("Circular dependency detected in `$command`.");
+        }
+
+        if (!key_exists($fullname, $list))
+        {
+          throw new RuntimeException("Command `$fullname` not found for `$command`.");
+        }
+
+        $depList[] = $fullname;
+        $depConfig = $list[$fullname];
+        if (key_exists('from', $depConfig))
+        {
+          foreach ($depConfig['from'] as $dep)
+          {
+            if (in_array($dep, $deps))
+            {
+              continue;
+            }
+
+            $deps[] = $dep;
+          }
+        }
+      }
+    }
+
     return $list;
+  }
+
+  private function checkFormat(string $name): bool
+  {
+    if (count(explode(':', $name)) > 2)
+    {
+      return false;
+    }
+    if (count(explode('/', explode(':', $name)[0])) > 3)
+    {
+      return false;
+    }
+
+    return true;
+  }
+
+  private function getDepencyFullname(string $name, string $parent): string
+  {
+    [$longName, $version] = explode(':', $parent);
+    [$domain, $component, $command] = explode('/', $longName);
+
+    if (count(explode(':', $name)) === 1)
+    {
+      $name .= ":$version";
+    }
+
+    [$depLongName, $depVersion] = explode(':', $name);
+
+    return match (count(explode('/', $depLongName)))
+    {
+      1 => "$domain/$component/$depLongName:$depVersion",
+      2 => "$domain/$depLongName:$depVersion",
+      3 => "$depLongName:$depVersion",
+    };
+  }
+
+  private function buildCommand(array &$list, string $command, array &$built): string
+  {
+    $buildFile = '';
+
+    $config = $list[$command];
+
+    if (key_exists('from', $config))
+    {
+      foreach ($config['from'] as $dependency)
+      {
+        $buildFile .= $this->buildCommand($list, $this->getDepencyFullname($dependency, $command), $built);
+      }
+    }
+
+    $name = explode(':', $command)[0];
+    $version = explode(':', $command)[1];
+    $context = implode('/', array_slice(explode('/', $name), 0, 2));
+
+    $buildFile .= "name=$name" . PHP_EOL;
+    $buildFile .= "version=$version" . PHP_EOL;
+    $buildFile .= "context=$context" . PHP_EOL;
+
+    foreach ($config['arguments'] as $argument => $value)
+    {
+      $buildFile .= "argument=$argument:$value" . PHP_EOL;
+    }
+    $buildFile .= 'build' . PHP_EOL;
+
+    $built[] = $command;
+
+    return $buildFile;
   }
 
   private function build(array $list): void
   {
     $buildFile = '';
+    $built = [];
     foreach ($list as $command => $config)
     {
-      $name = explode(':', $command)[0];
-      $version = explode(':', $command)[1];
-      $context = implode('/', array_slice(explode('/', $name), 0, 2));
-
-      $buildFile .= "name=$name" . PHP_EOL;
-      $buildFile .= "version=$version" . PHP_EOL;
-      $buildFile .= "context=$context" . PHP_EOL;
-
-      foreach ($config['arguments'] as $argument => $value)
+      if (!in_array($command, $built))
       {
-        $buildFile .= "argument=$argument:$value" . PHP_EOL;
+        $buildFile .= $this->buildCommand($list, $command, $built);
       }
-      $buildFile .= 'build' . PHP_EOL;
     }
 
+    $list = array_map(function ($cmd) {
+      return array_filter($cmd, function ($key) {
+        return in_array($key, [
+          'env',
+          'volumes',
+          'ports',
+          'interactive',
+          'detached',
+          'match-ids',
+          'workdir',
+        ]);
+      }, ARRAY_FILTER_USE_KEY);
+    }, $list);
+    if (
+      file_put_contents('build.cache', $buildFile, LOCK_EX) === false ||
+      file_put_contents('commands.cache', json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), LOCK_EX) === false)
+    {
+      throw new RuntimeException('Unable to create cache files.');
+    }
     echo count(array_keys($list)) . ' commands to build.' . PHP_EOL;
-    file_put_contents('build.cache', $buildFile, LOCK_EX);
   }
 }

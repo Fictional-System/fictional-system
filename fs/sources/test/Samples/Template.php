@@ -54,7 +54,12 @@ class Template extends ArrayObject
 
   public function toJson(): string
   {
-    return json_encode($this->getArrayCopy(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return self::arrayToJson($this->getArrayCopy());
+  }
+
+  public static function arrayToJson(array $arr): string
+  {
+    return json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
   }
 
   public static function getTemplate(array $names = [], int $version = 1): Template
