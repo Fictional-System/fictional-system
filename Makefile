@@ -17,7 +17,7 @@ update: test install
 	podman build --no-cache -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
 
 test:
-	podman build --no-cache -t ${PREFIX}fs/test -f ./fs/fs/Containerfile ./fs/sources
+	podman build -t ${PREFIX}fs/test -f ./fs/fs/Containerfile ./fs/sources
 	podman run --rm -it --userns=keep-id --name fs_test -v ${PWD}/fs/sources/test:/fs/test:z ${PREFIX}fs/test php /fs/test/test.php
 
 test-dev:
