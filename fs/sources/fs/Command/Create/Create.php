@@ -143,7 +143,7 @@ class Create extends Command
         throw new RuntimeException("`$file` already exist.");
       }
     }
-    else if (file_put_contents($file, $content) === false)
+    else if (@file_put_contents($file, $content) === false)
     {
       throw new RuntimeException("Unable to create `$file`");
     }
