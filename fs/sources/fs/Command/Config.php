@@ -193,7 +193,7 @@ class Config extends ArrayObject
     {
       $config = array_merge($config, $this['commands'][$cmd]['versions'][$version]);
     }
-    unset($config['versions'], $config['enabled'], $config['command']);
+    unset($config['versions'], $config['enabled']);
 
     return $config;
   }
