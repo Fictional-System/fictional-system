@@ -60,6 +60,7 @@ Tester::it('Duplicate component with files', function (ITest $tester) {
   $tester->assertDirExist('foo/foo/files');
   $tester->assertFileExist('foo/foo/Containerfile');
   $tester->assertFileExist('foo/foo/files/foo');
+  $tester->assertFileContent('foo/foo/files/foo', 'bar');
   $tester->assertFileContent('foo/foo/commands.json', Template::getJsonTemplate(['test']));
 });
 
