@@ -107,19 +107,21 @@ class Script extends Command
 
     foreach ($commandsConfig as $name => $config)
     {
-      [$domain, $component, $command] = explode('/', explode(':', $name)[0]);
-      $simplesCommand[$command][] = "$domain/$component/$command";
-      $componentsCommand["$component/$command"][] = "$domain/$component/$command";
+      [$longName, $version] = explode(':', $name);
+      [$domain, $component, $command] = explode('/', $longName);
+      $simplesCommand[$command][] = "$domain/$component/$command:$version";
+      $componentsCommand["$component/$command"][] = "$domain/$component/$command:$version";
     }
 
     foreach ($simplesCommand as $name => $commands)
     {
       if (count($commands) > 1)
       {
-        foreach ($commands as $command)
+        foreach ($commands as $commandName)
         {
-          [$domain, $component, $command] = explode('/', $command);
-          $scriptnames[$command] = $this->cleanName("$component/$command");
+          [$longName, $version] = explode(':', $commandName);
+          [$domain, $component, $command] = explode('/', $longName);
+          $scriptnames[$commandName] = $this->cleanName("$component/$command");
         }
       }
     }
@@ -128,10 +130,11 @@ class Script extends Command
     {
       if (count($commands) > 1)
       {
-        foreach ($commands as $command)
+        foreach ($commands as $commandName)
         {
-          [$domain, $component, $command] = explode('/', $command);
-          $scriptnames[$command] = $this->cleanName("$domain/$component/$command");
+          [$longName, $version] = explode(':', $commandName);
+          [$domain, $component, $command] = explode('/', $longName);
+          $scriptnames[$commandName] = $this->cleanName("$domain/$component/$command");
         }
       }
     }
@@ -159,7 +162,7 @@ class Script extends Command
     $this->getValue($config, 'interactive', false) ?? $cmdline[] = '-it';
     $this->getValue($config, 'detached', false) ?? $cmdline[] = '-d';
     $this->getValue($config, 'maths_ids', false) ?? $cmdline[] = '--userns=keep-id';
-    $this->getValue($config, 'workdir', '') ?? $cmdline[] = '-w ' . $this->getValue($config, 'workdir', '');
+    $this->getValue($config, 'workdir', '') ?? $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
 
     [$longName, $version] = explode(':', $command);
     $name = 'fs_' .
@@ -181,12 +184,13 @@ class Script extends Command
     $cmdline[] = $this->getValue($config, 'command', '');
     $cmdline[] = '$*';
 
-    $this->write(
-      $this->getValue(
+    $scriptname = $this->getValue(
         $config,
-        'scriptnames',
+        'scriptname',
         $this->cleanName(explode('/', $longName)[2])) .
-      ($version !== 'latest') ?? '_' . $this->cleanVersion($version),
+      ($version !== 'latest') ?? '_' . $this->cleanVersion($version);
+    $this->write(
+      $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);
   }
 
@@ -204,7 +208,7 @@ class Script extends Command
   {
     if (@file_put_contents("$this->cwd/bin/$name", $content, LOCK_EX) === false)
     {
-      throw new RuntimeException("Unable to create $name script.");
+      throw new RuntimeException("Unable to create `$name` script.");
     }
   }
 }
