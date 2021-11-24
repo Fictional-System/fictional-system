@@ -412,3 +412,94 @@ Tester::it('Circular dependency', function (ITest $tester): void {
 
   $tester->assertRun('build', 1, 'Circular dependency detected in `foo/bar/foo:latest`.');
 });
+
+Tester::it('Simple file', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  file_put_contents('foo/bar/files/foo', 'bar');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'bar');
+});
+
+Tester::it('Override file', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  file_put_contents('foo/bar/files/foo', 'bar');
+  $tester->mkdir('foo/bar/local');
+  file_put_contents('foo/bar/local/foo', 'foo');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'foo');
+});
+
+Tester::it('Override multiple file', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  file_put_contents('foo/bar/files/foo', 'bar');
+  file_put_contents('foo/bar/files/bar', 'foo');
+  file_put_contents('foo/bar/files/test', 'test');
+  $tester->mkdir('foo/bar/local');
+  file_put_contents('foo/bar/local/foo', 'foo');
+  file_put_contents('foo/bar/local/bar', 'bar');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'foo');
+  $tester->assertFileExist('foo/bar/cache/bar');
+  $tester->assertFileContent('foo/bar/cache/bar', 'bar');
+  $tester->assertFileExist('foo/bar/cache/test');
+  $tester->assertFileContent('foo/bar/cache/test', 'test');
+});
+
+Tester::it('Simple directory', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  $tester->mkdir('foo/bar/files/foo');
+  file_put_contents('foo/bar/files/foo/bar', 'bar');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo/bar');
+  $tester->assertFileContent('foo/bar/cache/foo/bar', 'bar');
+});
+
+Tester::it('Override directory', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  $tester->mkdir('foo/bar/files/foo');
+  file_put_contents('foo/bar/files/foo/bar', 'bar');
+  $tester->mkdir('foo/bar/local/foo');
+  file_put_contents('foo/bar/local/foo/bar', 'foo');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo/bar');
+  $tester->assertFileContent('foo/bar/cache/foo/bar', 'foo');
+});
+
+Tester::it('Multiple files in directory', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  $tester->mkdir('foo/bar/files/foo');
+  file_put_contents('foo/bar/files/foo/foo', 'bar');
+  file_put_contents('foo/bar/files/foo/bar', 'foo');
+  file_put_contents('foo/bar/files/foo/test', 'test');
+  $tester->mkdir('foo/bar/local/foo');
+  file_put_contents('foo/bar/local/foo/foo', 'foo');
+  file_put_contents('foo/bar/local/foo/bar', 'bar');
+
+  $tester->assertRun('build', 0, '1 commands to build.');
+  $tester->assertFileExist('foo/bar/cache/foo/foo');
+  $tester->assertFileContent('foo/bar/cache/foo/foo', 'foo');
+  $tester->assertFileExist('foo/bar/cache/foo/bar');
+  $tester->assertFileContent('foo/bar/cache/foo/bar', 'bar');
+  $tester->assertFileExist('foo/bar/cache/foo/test');
+  $tester->assertFileContent('foo/bar/cache/foo/test', 'test');
+});

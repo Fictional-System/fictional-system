@@ -178,7 +178,7 @@ class Test implements ITest
 
   public function mkdir(string $dir): void
   {
-    if (@mkdir($dir, 0700) === false)
+    if (@mkdir($dir, 0700, true) === false)
     {
       throw new \RuntimeException("Unable to create `$dir`.");
     }
