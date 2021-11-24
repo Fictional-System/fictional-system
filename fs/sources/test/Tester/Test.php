@@ -175,4 +175,12 @@ class Test implements ITest
       $this->addError();
     }
   }
+
+  public function mkdir(string $dir): void
+  {
+    if (@mkdir($dir, 0700) === false)
+    {
+      throw new \RuntimeException("Unable to create `$dir`.");
+    }
+  }
 }

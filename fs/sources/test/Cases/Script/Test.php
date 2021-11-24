@@ -33,7 +33,7 @@ Tester::it('Generate all scripts', function (ITest $tester): void {
   $tester->shadowRun('enable foo');
   $tester->shadowRun('build');
 
-  mkdir('bin', 0700);
+  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -44,6 +44,48 @@ Tester::it('Generate all scripts', function (ITest $tester): void {
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
+});
+
+Tester::it('Duplicate command in same domain', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test foo/foo/test');
+  $tester->shadowRun('enable foo/bar/test foo/foo/test');
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/bar_test');
+  $tester->assertFileContent('bin/bar_test',
+    Script::get('foo/bar/test', 'latest', 'test')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/foo_test');
+  $tester->assertFileContent('bin/foo_test',
+    Script::get('foo/foo/test', 'latest', 'test')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
+});
+
+Tester::it('Duplicate command in other domain', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test bar/bar/test');
+  $tester->shadowRun('enable foo/bar/test bar/bar/test');
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo_bar_test');
+  $tester->assertFileContent('bin/foo_bar_test',
+    Script::get('foo/bar/test', 'latest', 'test')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar_bar_test');
+  $tester->assertFileContent('bin/bar_bar_test',
+    Script::get('bar/bar/test', 'latest', 'test')
       ->addVolume('$PWD:/app')
       ->getScript()
   );
