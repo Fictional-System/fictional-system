@@ -22,7 +22,7 @@ class Script
 
   public function addVolume(string $volume): Script
   {
-    $this->volumes[] = '-v ' . $volume . ':z';
+    $this->volumes[] = $volume;
 
     return $this;
   }
@@ -40,16 +40,21 @@ class Script
       preg_replace('/[^A-Za-z0-9.]/', '_', $this->name) .
       '_' .
       preg_replace('/[^A-Za-z0-9]/', '_', $this->version);
-    return '#!/bin/sh' . PHP_EOL .
-      PHP_EOL .
-      'podman run --rm ' .
-      ($this->interactive ? '-it ' : '') .
-      ($this->detached ? '-d ' : '') .
-      ($this->maths_ids ? '--userns=keep-id ' : '') .
-      ($this->workdir !== '' ? '-w ' . $this->workdir . ' ' : '') .
-      '--name ' . $name . '_$$ '
-      . implode(' ', $this->volumes) . (count($this->volumes) ? ' ' : '') .
-      $this->prefix . '/' . $this->name . ':' . $this->version . ' ' .
-      $this->command . ($this->detached ? '' : ' $*') . PHP_EOL;
+
+    $cmdline = ['podman run --rm'];
+    $this->interactive ?? $cmdline[] = '-it';
+    $this->detached ?? $cmdline[] = '-d';
+    $this->maths_ids ?? $cmdline[] = '--userns=keep-id';
+    $this->workdir !== '' ?? $cmdline[] = '-w ' . $this->workdir;
+    $cmdline[] = '--name ' . $name . '_$$';
+    foreach ($this->volumes as $volume)
+    {
+      $cmdline[] = "-v $volume:z";
+    }
+    $cmdline[] = $this->prefix . '/' . $this->name . ':' . $this->version;
+    $cmdline[] = $this->command;
+    $cmdline[] = '$*';
+
+    return '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL;
   }
 }
