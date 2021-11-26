@@ -10,7 +10,7 @@ Tester::it('Nothing to build', function (ITest $tester): void {
 
   $tester->assertRun('build', 0, '0 commands to build.');
   $tester->assertFileExist('build.cache');
-  $tester->assertFileContent('build.cache', '');
+  $tester->assertFileContent('build.cache', PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([]));
 });

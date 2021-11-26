@@ -38,7 +38,7 @@ class Config extends ArrayObject
       throw new RuntimeException("Config encode error.");
     }
 
-    if (file_put_contents($this->path, $config) === false)
+    if (file_put_contents($this->path, $config . PHP_EOL) === false)
     {
       throw new RuntimeException("Cannot write `$this->path`.");
     }

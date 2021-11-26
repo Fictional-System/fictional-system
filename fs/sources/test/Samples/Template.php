@@ -59,7 +59,7 @@ class Template extends ArrayObject
 
   public static function arrayToJson(array $arr): string
   {
-    return json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return trim(json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . PHP_EOL;
   }
 
   public static function getTemplate(array $names = [], int $version = 1): Template

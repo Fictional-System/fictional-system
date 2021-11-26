@@ -250,8 +250,8 @@ class Build extends Command
       }, ARRAY_FILTER_USE_KEY);
     }, $list);
     if (
-      @file_put_contents("$this->cwd/build.cache", $buildFile, LOCK_EX) === false ||
-      @file_put_contents("$this->cwd/commands.cache", json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), LOCK_EX) === false)
+      @file_put_contents("$this->cwd/build.cache", trim($buildFile) . PHP_EOL, LOCK_EX) === false ||
+      @file_put_contents("$this->cwd/commands.cache", json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL, LOCK_EX) === false)
     {
       throw new RuntimeException('Unable to create cache files.');
     }
