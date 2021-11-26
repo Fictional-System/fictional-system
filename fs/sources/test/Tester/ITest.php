@@ -20,6 +20,8 @@ interface ITest
 
   public function assertNotEqualStrict(mixed $val1, mixed $val2): void;
 
+  public function assertFileNotExist(string $path): void;
+
   public function assertFileExist(string $path): void;
 
   public function assertDirExist(string $path): void;

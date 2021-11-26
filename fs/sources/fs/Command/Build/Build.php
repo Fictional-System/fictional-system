@@ -196,6 +196,25 @@ class Build extends Command
     return $buildFile;
   }
 
+  private function buildFiles(array $list): void
+  {
+    sort($list);
+
+    foreach ($list as $path)
+    {
+      if ($this->fw->exists("$path/cache"))
+      {
+        $this->fw->cleanDir("$path/cache");
+      }
+      $this->fw->copy("$path/files", "$path/cache", true);
+
+      if ($this->fw->exists("$path/local"))
+      {
+        $this->fw->copy("$path/local", "$path/cache", true);
+      }
+    }
+  }
+
   private function build(array $list): void
   {
     $buildFile = '';
@@ -207,6 +226,10 @@ class Build extends Command
         $buildFile .= $this->buildCommand($list, $command, $built);
       }
     }
+
+    $this->buildFiles(array_unique(array_map(function ($command) {
+      return implode('/', array_slice(explode('/', explode(':', $command)[0]), 0, 2));
+    }, array_keys($list))));
 
     $list = array_map(function ($cmd) {
       return array_filter($cmd, function ($key) {

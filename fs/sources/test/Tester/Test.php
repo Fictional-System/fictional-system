@@ -131,6 +131,14 @@ class Test implements ITest
     }
   }
 
+  public function assertFileNotExist(string $path): void
+  {
+    if (file_exists($path))
+    {
+      $this->addError();
+    }
+  }
+
   public function assertFileExist(string $path): void
   {
     if (!file_exists($path))

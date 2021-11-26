@@ -503,3 +503,57 @@ Tester::it('Multiple files in directory', function (ITest $tester): void {
   $tester->assertFileExist('foo/bar/cache/foo/test');
   $tester->assertFileContent('foo/bar/cache/foo/test', 'test');
 });
+
+Tester::it('Generate files', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  file_put_contents('foo/bar/files/foo', 'bar');
+
+  $tester->shadowRun('build');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'bar');
+
+  $tester->mkdir('foo/bar/local');
+  file_put_contents('foo/bar/local/foo', 'foo');
+
+  $tester->shadowRun('build');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'foo');
+
+  file_put_contents('foo/bar/local/foo', 'test');
+
+  $tester->shadowRun('build');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'test');
+});
+
+Tester::it('Remove files', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+
+  file_put_contents('foo/bar/files/foo', 'bar');
+  $tester->mkdir('foo/bar/local');
+  file_put_contents('foo/bar/local/foo', 'foo');
+
+  $tester->shadowRun('build');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'foo');
+
+  file_put_contents('foo/bar/local/bar', 'bar');
+  unlink('foo/bar/local/foo');
+
+  $tester->shadowRun('build');
+  $tester->assertFileExist('foo/bar/cache/foo');
+  $tester->assertFileContent('foo/bar/cache/foo', 'bar');
+  $tester->assertFileExist('foo/bar/cache/bar');
+  $tester->assertFileContent('foo/bar/cache/bar', 'bar');
+
+  unlink('foo/bar/files/foo');
+
+  $tester->shadowRun('build');
+  $tester->assertFileNotExist('foo/bar/cache/foo');
+  $tester->assertFileExist('foo/bar/cache/bar');
+  $tester->assertFileContent('foo/bar/cache/bar', 'bar');
+});
+
