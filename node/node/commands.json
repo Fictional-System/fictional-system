@@ -1,0 +1,63 @@
+{
+    "version": 1,
+    "default": {
+        "versions": {
+            "latest": {
+                "from": [],
+                "arguments": {
+                    "VERSION": 16
+                }
+            }
+        },
+        "arguments": [],
+        "env": [],
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "npm": {
+            "command": "npm",
+            "enabled": false
+        },
+        "ng": {
+            "command": "ng",
+            "enabled": false,
+            "from": [
+                "npm"
+            ],
+            "versions": {
+                "latest": {
+                    "arguments": {
+                        "VERSION": "latest"
+                    }
+                }
+            },
+            "arguments": {
+                "GLOBAL": "@angular/cli"
+            }
+        },
+        "ionic": {
+            "command": "ionic",
+            "enabled": false,
+            "from": [
+                "npm"
+            ],
+            "versions": {
+                "latest": {
+                    "arguments": {
+                        "VERSION": "latest"
+                    }
+                }
+            },
+            "arguments": {
+                "GLOBAL": "@ionic/cli @angular/cli "
+            }
+        }
+    }
+}

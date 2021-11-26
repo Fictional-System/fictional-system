@@ -1,9 +1,0 @@
-name=ionic
-commmand=ionic
-versions=16
-volumes=$PWD:/app
-from=npm
-
-interactive=true
-detached=false
-idmatch=true

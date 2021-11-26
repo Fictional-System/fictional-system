@@ -1,0 +1,17 @@
+ARG FROM=docker.io/library/node
+ARG VERSION=latest-alpine
+ARG GLOBAL=""
+ARG APK_DEP=""
+
+FROM ${FROM}:${VERSION}
+
+USER root
+
+RUN apk add --no-cache git ${APK_DEP}
+
+RUN [ $(echo ${GLOBAL} | wc -m) -eq 0 ] || npm install -g ${GLOBAL}
+
+RUN mkdir /app
+WORKDIR /app
+
+USER node
