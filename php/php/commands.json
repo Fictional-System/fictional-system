@@ -1,0 +1,51 @@
+{
+    "version": 1,
+    "default": {
+        "versions": {
+            "latest": {
+                "from": [],
+                "arguments": {
+                    "VERSION": "8-cli-alpine"
+                }
+            }
+        },
+        "arguments": {
+            "FROM": "php"
+        },
+        "env": [],
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "php": {
+            "command": "php",
+            "enabled": false
+        },
+        "xdebug": {
+            "command": "php",
+            "enabled": false,
+            "from": [
+                "php"
+            ],
+            "versions": {
+                "latest": {
+                    "arguments": {
+                        "VERSION": "latest"
+                    }
+                }
+            },
+            "arguments": {
+                "FROM": "localhost/fs/php/php/php",
+                "APK_TEMP_ADD": "pcre-dev",
+                "PECL_INSTALL": "xdebug",
+                "DOCKER_PHP_EXT_ENABLE": "xdebug"
+            }
+        }
+    }
+}

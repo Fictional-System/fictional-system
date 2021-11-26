@@ -5,7 +5,7 @@ ARG DOCKER_PHP_EXT_INSTALL=""
 ARG PECL_INSTALL=""
 ARG DOCKER_PHP_EXT_ENABLE=""
 
-FROM localhost/fs/php/php:${VERSION}
+FROM localhost/fs/php/php/xdebug:${VERSION}
 
 USER root
 
