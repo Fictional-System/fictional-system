@@ -40,8 +40,6 @@ class Config extends ArrayObject
         'enabled' => false,
       ],
       'default' => [
-        'from' => [],
-        'arguments' => [],
         'volumes' => [],
         'ports' => [],
         'interactive' => false,
@@ -100,6 +98,10 @@ class Config extends ArrayObject
       'match-ids',
       'workdir',
       'command',
+    ],
+    'build' => [
+      'from',
+      'arguments',
     ]
   ];
 
@@ -236,17 +238,19 @@ class Config extends ArrayObject
   /**
    * @return string[]
    */
-  public function getTags(string $cmd): array
+  public function getTags(): array
   {
-    if (!key_exists($cmd, $this['commands']))
-    {
-      throw new RuntimeException("Command `$cmd` not found.");
-    }
+    return array_keys($this['default']['tags']);
+  }
 
-    $defaultVersions = array_keys($this['default']['tags']);
-    $commandVersions = key_exists('tags', $this['commands'][$cmd]) ? array_keys($this['commands'][$cmd]['tags']) : [];
-
-    return array_merge($defaultVersions, $commandVersions);
+  public function getBuildConfig(string $tag = 'latest'): array
+  {
+    return $this->filterConfig(
+      $this->mergeConfig(
+        $this->filterConfig($this['default']),
+        $this->filterConfig($this['default']['tags'][$tag], 'tag')
+      ),
+      'build');
   }
 
   public function getTagConfig(string $cmd, string $tag): array
@@ -262,14 +266,14 @@ class Config extends ArrayObject
     $commandTagConfig = [];
     if (key_exists('tags', $this['commands'][$cmd]) && key_exists($tag, $this['commands'][$cmd]['tags']))
     {
-      $commandTagConfig = $this->filterConfig($this['commands'][$cmd]['tags'][$tag], 'tag');
+      $commandTagConfig = $this->filterConfig($this['commands'][$cmd]['tags'][$tag], 'command');
     }
 
     $config = $this->mergeConfig($config, $commandConfig);
     $config = $this->mergeConfig($config, $tagConfig);
     $config = $this->mergeConfig($config, $commandTagConfig);
 
-    return $this->filterConfig($config, 'final', $this['version']);
+    return $this->filterConfig($config, 'command', $this['version']);
   }
 
   private function filterConfig(array $arr, string $keysFilter = 'default', int $version = null): array

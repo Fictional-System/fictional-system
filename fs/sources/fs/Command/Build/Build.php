@@ -4,6 +4,7 @@ namespace Command\Build;
 
 use Command\Command;
 use Command\Config;
+use Command\FileWrapper;
 use RuntimeException;
 
 class Build extends Command
@@ -43,7 +44,7 @@ class Build extends Command
 
     foreach (scandir($this->cwd) as $domain)
     {
-      if (in_array($domain, ['.', '..', '.git', '.github', 'bin', 'fs']))
+      if (in_array($domain, FileWrapper::IGNORED_ROOT_FILES))
       {
         continue;
       }
@@ -51,7 +52,7 @@ class Build extends Command
       {
         foreach (scandir("$this->cwd/$domain") as $component)
         {
-          if (in_array($component, ['.', '..', '.git']))
+          if (in_array($component, FileWrapper::IGNORED_FILES))
           {
             continue;
           }
@@ -59,11 +60,17 @@ class Build extends Command
           {
             $config = new Config("$this->cwd/$domain/$component/commands.json");
 
-            foreach ($config->getEnabledCommands() as $command)
+            foreach ($config->getTags() as $tag)
             {
-              foreach ($config->getTags($command) as $version)
+              $list["$domain/$component:$tag"] = ['build' => $config->getBuildConfig($tag), 'commands' => []];
+              foreach ($config->getEnabledCommands() as $command)
               {
-                $list["$domain/$component/$command:$version"] = $config->getTagConfig($command, $version);
+                $list["$domain/$component:$tag"]['commands'][$command] = $config->getTagConfig($command, $tag);
+              }
+
+              if (count($list["$domain/$component:$tag"]['commands']) === 0)
+              {
+                unset($list["$domain/$component:$tag"]);
               }
             }
           }
@@ -71,7 +78,6 @@ class Build extends Command
       }
     }
 
-    //var_dump($list);
     return $list;
   }
 
@@ -79,47 +85,46 @@ class Build extends Command
   {
     $depList = [];
 
-    foreach ($list as $command => $config)
+    foreach ($list as $component => $config)
     {
-      $commandDeps = [];
-      if (in_array($command, $depList))
+      $componentDeps = [];
+      if (in_array($component, $depList))
       {
         continue;
       }
-      $depList[] = $command;
-      if (!key_exists('from', $config))
+      $depList[] = $component;
+      if (!key_exists('from', $config['build']))
       {
         continue;
       }
-      $deps = $config['from'];
+      $deps = $config['build']['from'];
       while (count($deps))
       {
         $dep = array_shift($deps);
         if (!$this->checkFormat($dep))
         {
-          throw new RuntimeException("Dependency `$dep` in `$command` is not a valid dependency.");
+          throw new RuntimeException("Dependency `$dep` in `$component` is not a valid dependency.");
         }
-        $fullname = $this->getDepencyFullname($dep, $command);
-
-        if (in_array($fullname, $commandDeps))
+        $fullname = $this->getDepencyFullname($dep, $component);
+        if (in_array($fullname, $componentDeps))
         {
-          throw new RuntimeException("Circular dependency detected in `$fullname`.");
+          throw new RuntimeException("Circular dependency detected in `$component`.");
         }
 
         if (!key_exists($fullname, $list))
         {
-          throw new RuntimeException("Command `$fullname` not found for `$command`.");
+          throw new RuntimeException("Component `$fullname` not found for `$component`.");
         }
 
         if (!in_array($fullname, $depList))
         {
           $depList[] = $fullname;
         }
-        $commandDeps[] = $fullname;
+        $componentDeps[] = $fullname;
         $depConfig = $list[$fullname];
-        if (key_exists('from', $depConfig))
+        if (key_exists('from', $depConfig['build']))
         {
-          foreach ($depConfig['from'] as $dep)
+          foreach ($depConfig['build']['from'] as $dep)
           {
             if (in_array($dep, $deps))
             {
@@ -141,7 +146,7 @@ class Build extends Command
     {
       return false;
     }
-    if (count(explode('/', explode(':', $name)[0])) > 3)
+    if (count(explode('/', explode(':', $name)[0])) > 2)
     {
       return false;
     }
@@ -151,45 +156,46 @@ class Build extends Command
 
   private function getDepencyFullname(string $name, string $parent): string
   {
-    [$longName, $version] = explode(':', $parent);
-    [$domain, $component, $command] = explode('/', $longName);
+    [$longName, $tag] = explode(':', $parent);
+    $domain = explode('/', $longName)[0];
 
     if (count(explode(':', $name)) === 1)
     {
-      $name .= ":$version";
+      $name .= ":$tag";
     }
 
-    [$depLongName, $depVersion] = explode(':', $name);
+    [$depLongName, $depTag] = explode(':', $name);
 
     return match (count(explode('/', $depLongName)))
     {
-      1 => "$domain/$component/$depLongName:$depVersion",
-      2 => "$domain/$depLongName:$depVersion",
-      3 => "$depLongName:$depVersion",
+      1 => "$domain/$depLongName:$depTag",
+      2 => "$depLongName:$depTag",
     };
   }
 
-  private function buildCommand(array &$list, string $command, array &$built): string
+  private function buildComponent(array &$list, string $component, array &$built): string
   {
     $buildFile = '';
 
-    $config = $list[$command];
+    if (in_array($component, $built))
+    {
+      return $buildFile;
+    }
+
+    $config = $list[$component]['build'];
 
     if (key_exists('from', $config))
     {
       foreach ($config['from'] as $dependency)
       {
-        $buildFile .= $this->buildCommand($list, $this->getDepencyFullname($dependency, $command), $built);
+        $buildFile .= $this->buildComponent($list, $this->getDepencyFullname($dependency, $component), $built);
       }
     }
 
-    $name = explode(':', $command)[0];
-    $version = explode(':', $command)[1];
-    $context = implode('/', array_slice(explode('/', $name), 0, 2));
+    [$name, $tag] = explode(':', $component);
 
     $buildFile .= "name=$name" . PHP_EOL;
-    $buildFile .= "version=$version" . PHP_EOL;
-    $buildFile .= "context=$context" . PHP_EOL;
+    $buildFile .= "tag=$tag" . PHP_EOL;
 
     foreach ($config['arguments'] as $argument => $value)
     {
@@ -197,7 +203,7 @@ class Build extends Command
     }
     $buildFile .= 'build' . PHP_EOL;
 
-    $built[] = $command;
+    $built[] = $component;
 
     return $buildFile;
   }
@@ -229,22 +235,21 @@ class Build extends Command
   {
     $buildFile = '';
     $built = [];
-    foreach ($list as $command => $config)
+    foreach ($list as $component => $config)
     {
-      if (!in_array($command, $built))
-      {
-        $buildFile .= $this->buildCommand($list, $command, $built);
-      }
+      $buildFile .= $this->buildComponent($list, $component, $built);
     }
 
-    $this->buildFiles(array_unique(array_map(function ($command) {
-      return implode('/', array_slice(explode('/', explode(':', $command)[0]), 0, 2));
+    $this->buildFiles(array_unique(array_map(function ($component) {
+      return explode(':', $component)[0];
     }, array_keys($list))));
 
-    $list = array_map(function ($cmd) {
-      return array_filter($cmd, function ($value, $key) {
-        return in_array($key, Config::FILTER_CONFIG_KEYS['cache']);
-      }, ARRAY_FILTER_USE_BOTH);
+    $list = array_map(function ($component) {
+      return array_map(function ($command) {
+        return array_filter($command, function ($value, $key) {
+          return in_array($key, Config::FILTER_CONFIG_KEYS['cache']);
+        }, ARRAY_FILTER_USE_BOTH);
+      }, $component['commands']);
     }, $list);
     if (
       @file_put_contents("$this->cwd/build.cache", trim($buildFile) . PHP_EOL, LOCK_EX) === false ||
@@ -252,6 +257,10 @@ class Build extends Command
     {
       throw new RuntimeException('Unable to create cache files.');
     }
-    echo count(array_keys($list)) . ' commands to build.' . PHP_EOL;
+
+    $count = array_reduce($list, function ($sum, $cmp) {
+      return $sum + count($cmp);
+    }, 0);
+    echo $count . ' commands to build.' . PHP_EOL;
   }
 }

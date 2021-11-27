@@ -6,6 +6,21 @@ use RuntimeException;
 
 class FileWrapper
 {
+  const IGNORED_ROOT_FILES = [
+    '.',
+    '..',
+    '.git',
+    '.github',
+    'bin',
+    'fs',
+  ];
+
+  const IGNORED_FILES = [
+    '.',
+    '..',
+    '.git',
+  ];
+
   public function __construct(private string $cwd)
   {
   }

@@ -22,23 +22,24 @@ Tester::it('Simple build', function (ITest $tester): void {
   $tester->assertRun('build', 0, '1 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/test:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
     ]
   ]));
 });
@@ -54,24 +55,25 @@ Tester::it('Complete build', function (ITest $tester): void {
   $tester->assertRun('build', 0, '1 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
     'argument=argument value' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/test:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
     ]
   ]));
 });
@@ -87,57 +89,54 @@ Tester::it('Multiple build', function (ITest $tester): void {
   $tester->assertRun('build', 0, '3 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL .
-    'name=foo/bar/foo' . PHP_EOL .
+    'name=test/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
-    'argument=FROM_TAG latest' . PHP_EOL .
-    'build' . PHP_EOL .
-    'name=test/bar/bar' . PHP_EOL .
-    'tag=latest' . PHP_EOL .
-    'context=test/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
     'argument=argument value' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/test:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'foo',
+      ],
     ],
-    'foo/bar/foo:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'test/bar:latest' => [
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'bar',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'foo',
     ],
-    'test/bar/bar:latest' => [
-      'volumes' => [
-        '$PWD:/app'
-      ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'bar',
-    ]
   ]));
 });
 
@@ -145,8 +144,12 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
   $tester->shadowRun('create foo/bar/test foo/bar/foo foo/bar/bar');
   $tester->shadowRun('enable foo/bar/test foo/bar/foo foo/bar/bar');
   $config = new Config('foo/bar/commands.json');
-  $config['default']['arguments']['argument'] = 'default';
+  $config['default']['arguments']['argument'] = 'default-version';
+  $config['default']['tags']['latest']['arguments']['argument'] = 'default';
   $config['default']['tags']['before'] = [
+    'arguments' => [
+      'argument' => 'before'
+    ],
     'volumes' => ['test:test'],
   ];
   $config['commands']['foo']['volumes'] = [
@@ -170,216 +173,214 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
   $tester->assertRun('build', 0, '6 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
     'argument=argument default' . PHP_EOL .
     'build' . PHP_EOL .
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=before' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
     'argument=FROM_TAG latest' . PHP_EOL .
-    'argument=argument default-version' . PHP_EOL .
-    'build' . PHP_EOL .
-    'name=foo/bar/foo' . PHP_EOL .
-    'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
-    'argument=FROM_TAG latest' . PHP_EOL .
-    'argument=argument foo' . PHP_EOL .
-    'build' . PHP_EOL .
-    'name=foo/bar/foo' . PHP_EOL .
-    'tag=before' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
-    'argument=FROM_TAG latest' . PHP_EOL .
-    'argument=argument foo-version' . PHP_EOL .
-    'build' . PHP_EOL .
-    'name=foo/bar/bar' . PHP_EOL .
-    'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
-    'argument=FROM_TAG latest' . PHP_EOL .
-    'build' . PHP_EOL .
-    'name=foo/bar/bar' . PHP_EOL .
-    'tag=before' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
-    'argument=FROM_TAG latest' . PHP_EOL .
+    'argument=argument before' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/test:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app',
+          'foo:/app',
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'foo',
+      ],
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => true,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'bar',
+      ]
     ],
-    'foo/bar/test:before' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:before' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app',
+          'test:test',
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app',
+          'foo:/app',
+          'test:test',
+          'old:old'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'foo',
+      ],
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app',
+          'test:test',
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'bar',
+      ],
     ],
-    'foo/bar/foo:latest' => [
-      'volumes' => [
-        '$PWD:/app'
-      ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'foo',
-    ],
-    'foo/bar/foo:before' => [
-      'volumes' => [
-        '$PWD:/app'
-      ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'foo',
-    ],
-    'foo/bar/bar:latest' => [
-      'volumes' => [
-        '$PWD:/app'
-      ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'bar',
-    ],
-    'foo/bar/bar:before' => [
-      'volumes' => [
-        '$PWD:/app'
-      ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'bar',
-    ]
   ]));
 });
 
 Tester::it('Simple dependency', function (ITest $tester): void {
-  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
-  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('create foo/foo/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/foo/foo foo/bar/bar');
 
-  $config = new Config('foo/bar/commands.json');
-  $config['commands']['foo']['tags']['latest']['from'] = ['foo/bar/bar'];
+  $config = new Config('foo/foo/commands.json');
+  $config['default']['from'] = ['foo/bar'];
   $config->save();
 
   $tester->assertRun('build', 0, '2 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/bar' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL .
-    'name=foo/bar/foo' . PHP_EOL .
+    'name=foo/foo' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/foo:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'bar',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'foo',
     ],
-    'foo/bar/bar:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/foo:latest' => [
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'foo',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'bar',
     ]
   ]));
 });
 
 Tester::it('Multi Level dependency', function (ITest $tester): void {
-  $tester->shadowRun('create foo/bar/foo foo/bar/bar foo/bar/test');
-  $tester->shadowRun('enable foo/bar/foo foo/bar/bar foo/bar/test');
+  $tester->shadowRun('create foo/foo/foo foo/bar/bar foo/test/test');
+  $tester->shadowRun('enable foo/foo/foo foo/bar/bar foo/test/test');
 
+  $config = new Config('foo/foo/commands.json');
+  $config['default']['from'] = ['foo/bar'];
+  $config->save();
   $config = new Config('foo/bar/commands.json');
-  $config['commands']['foo']['tags']['latest']['from'] = ['foo/bar/bar'];
-  $config['commands']['bar']['tags']['latest']['from'] = ['foo/bar/test'];
+  $config['default']['from'] = ['foo/test'];
   $config->save();
 
   $tester->assertRun('build', 0, '3 commands to build.');
   $tester->assertFileExist('build.cache');
   $tester->assertFileContent('build.cache',
-    'name=foo/bar/test' . PHP_EOL .
+    'name=foo/test' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL .
-    'name=foo/bar/bar' . PHP_EOL .
+    'name=foo/bar' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL .
-    'name=foo/bar/foo' . PHP_EOL .
+    'name=foo/foo' . PHP_EOL .
     'tag=latest' . PHP_EOL .
-    'context=foo/bar' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
     'build' . PHP_EOL);
   $tester->assertFileExist('commands.cache');
   $tester->assertFileContent('commands.cache', Template::arrayToJson([
-    'foo/bar/foo:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/bar:latest' => [
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'bar',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'foo',
     ],
-    'foo/bar/bar:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/foo:latest' => [
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'foo',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'bar',
     ],
-    'foo/bar/test:latest' => [
-      'volumes' => [
-        '$PWD:/app'
+    'foo/test:latest' => [
+      'test' => [
+        'volumes' => [
+          '$PWD:/app'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '/app',
+        'command' => 'test',
       ],
-      'ports' => [],
-      'interactive' => false,
-      'detached' => false,
-      'match-ids' => false,
-      'workdir' => '/app',
-      'command' => 'test',
-    ]
+    ],
   ]));
 });
 
@@ -388,22 +389,24 @@ Tester::it('Non existent dependency', function (ITest $tester): void {
   $tester->shadowRun('enable foo/bar/foo');
 
   $config = new Config('foo/bar/commands.json');
-  $config['commands']['foo']['tags']['latest']['from'] = ['foo/bar/bar'];
+  $config['default']['from'] = ['foo/foo'];
   $config->save();
 
-  $tester->assertRun('build', 1, 'Command `foo/bar/bar:latest` not found for `foo/bar/foo:latest`.');
+  $tester->assertRun('build', 1, 'Component `foo/foo:latest` not found for `foo/bar:latest`.');
 });
 
 Tester::it('Circular dependency', function (ITest $tester): void {
-  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
-  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('create foo/bar/foo foo/foo/foo');
+  $tester->shadowRun('enable foo/bar/foo foo/foo/foo');
 
   $config = new Config('foo/bar/commands.json');
-  $config['commands']['foo']['tags']['latest']['from'] = ['foo/bar/bar'];
-  $config['commands']['bar']['tags']['latest']['from'] = ['foo/bar/foo'];
+  $config['default']['from'] = ['foo/foo'];
+  $config->save();
+  $config = new Config('foo/foo/commands.json');
+  $config['default']['from'] = ['foo/bar'];
   $config->save();
 
-  $tester->assertRun('build', 1, 'Circular dependency detected in `foo/bar/foo:latest`.');
+  $tester->assertRun('build', 1, 'Circular dependency detected in `foo/bar:latest`.');
 });
 
 Tester::it('Simple file', function (ITest $tester): void {
@@ -549,4 +552,3 @@ Tester::it('Remove files', function (ITest $tester): void {
   $tester->assertFileExist('foo/bar/cache/bar');
   $tester->assertFileContent('foo/bar/cache/bar', 'bar');
 });
-
