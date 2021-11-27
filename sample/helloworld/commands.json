@@ -1,13 +1,17 @@
 {
     "version": 1,
     "default": {
-        "versions": {
+        "from": [],
+        "tags": {
             "latest": {
-                "from": []
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
             }
         },
-        "arguments": [],
-        "env": [],
+        "arguments": {
+            "FROM_TAG": "latest"
+        },
         "volumes": [],
         "ports": [],
         "interactive": false,
