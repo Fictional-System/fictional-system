@@ -1,13 +1,14 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
 ARG APK_ADD=""
 ARG APK_TEMP_ADD=""
 ARG DOCKER_PHP_EXT_INSTALL=""
 ARG PECL_INSTALL=""
 ARG DOCKER_PHP_EXT_ENABLE=""
 
-FROM localhost/fs/php/php/xdebug:${VERSION}
+FROM localhost/fs/php/xdebug:${FROM_TAG}
 
 USER root
+ENV XDEBUG_MODE coverage
 
 RUN apk add --no-cache ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS} coreutils
 RUN docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}

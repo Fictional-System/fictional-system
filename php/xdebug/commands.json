@@ -2,7 +2,7 @@
     "version": 1,
     "default": {
         "from": [
-            "xdebug"
+            "php"
         ],
         "tags": {
             "latest": {
@@ -12,13 +12,12 @@
             }
         },
         "arguments": {
-            "APK_ADD": "git zip",
-            "APK_TEMP_ADD": "libzip-dev",
-            "DOCKER_PHP_EXT_INSTALL": "zip"
+            "APK_TEMP_ADD": "pcre-dev",
+            "PECL_INSTALL": "xdebug",
+            "DOCKER_PHP_EXT_ENABLE": "xdebug"
         },
         "volumes": [
-            "$PWD:/app",
-            "$HOME/.composer/cache:/home/php/.composer/cache"
+            "$PWD:/app"
         ],
         "ports": [],
         "interactive": true,
@@ -27,8 +26,8 @@
         "workdir": "/app"
     },
     "commands": {
-        "composer": {
-            "command": "composer",
+        "xdebug": {
+            "command": "xdebug",
             "enabled": false
         }
     }
