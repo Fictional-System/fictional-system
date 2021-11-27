@@ -1,15 +1,15 @@
 {
     "version": 1,
     "default": {
-        "versions": {
+        "from": [],
+        "tags": {
             "latest": {
-                "from": []
+                "FROM_TAG": "34"
             }
         },
         "arguments": {
-            "VERSION": "34"
+            "FROM_TAG": "34"
         },
-        "env": [],
         "volumes": [
             "/data/share:/data/share"
         ],
