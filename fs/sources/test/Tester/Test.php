@@ -155,8 +155,13 @@ class Test implements ITest
     }
   }
 
-  public function assertFileContent(string $path, string $content): void
+  public function assertFileContent(string $path, string $content, bool $debugOutput = false): void
   {
+    if ($debugOutput)
+    {
+      var_dump([$path => file_get_contents($path)]);
+    }
+
     if (!file_exists($path) || is_dir($path) || (file_get_contents($path) !== $content))
     {
       $this->addError();
