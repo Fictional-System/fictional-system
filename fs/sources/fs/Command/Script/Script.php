@@ -103,39 +103,32 @@ class Script extends Command
     echo "$count scripts generated." . PHP_EOL;
   }
 
-  private function completeScriptsName(array &$commandsConfig)
+  private function completeScriptsName(array &$components)
   {
-    var_dump($commandsConfig);
-    foreach ($commandsConfig as $name => $commands)
-    {
-      foreach ($commands as $command => $config)
-      {
-
-      }
-    }
-
-
     $simplesCommand = [];
     $componentsCommand = [];
     $scriptnames = [];
 
-    foreach ($commandsConfig as $name => $config)
+    foreach ($components as $componentNameAndTag => $commands)
     {
-      [$longName, $tag] = explode(':', $name);
-      [$domain, $component, $command] = explode('/', $longName);
-      $simplesCommand[$command][] = "$domain/$component/$command:$tag";
-      $componentsCommand["$component/$command"][] = "$domain/$component/$command:$tag";
+      [$componentFullName, $componentTag] = explode(':', $componentNameAndTag);
+      [$domainName, $componentName] = explode('/', $componentFullName);
+      foreach ($commands as $commandName => $command)
+      {
+          $simplesCommand[$commandName][] = "$domainName/$componentName/$commandName:$componentTag";
+          $componentsCommand["$componentName/$commandName"][] = "$domainName/$componentName/$commandName:$componentTag";
+      }
     }
 
     foreach ($simplesCommand as $name => $commands)
     {
       if (count($commands) > 1)
       {
-        foreach ($commands as $commandName)
+        foreach ($commands as $fullName)
         {
-          [$longName, $tag] = explode(':', $commandName);
-          [$domain, $component, $command] = explode('/', $longName);
-          $scriptnames[$commandName] = $this->cleanName("$component/$command");
+          [$commandFullName, $tag] = explode(':', $fullName);
+          [$domainName, $componentName, $commandName] = explode('/', $commandFullName);
+          $scriptnames["$domainName/$componentName:$tag"][$commandName] = $this->cleanName("$componentName/$commandName");
         }
       }
     }
@@ -144,18 +137,21 @@ class Script extends Command
     {
       if (count($commands) > 1)
       {
-        foreach ($commands as $commandName)
+        foreach ($commands as $fullName)
         {
-          [$longName, $tag] = explode(':', $commandName);
-          [$domain, $component, $command] = explode('/', $longName);
-          $scriptnames[$commandName] = $this->cleanName("$domain/$component/$command");
+          [$commandFullName, $tag] = explode(':', $fullName);
+          [$domainName, $componentName, $commandName] = explode('/', $commandFullName);
+          $scriptnames["$domainName/$componentName:$tag"][$commandName] = $this->cleanName("$domainName/$componentName/$commandName");
         }
       }
     }
 
-    foreach ($scriptnames as $name => $scriptname)
+    foreach ($scriptnames as $componentNameAndTag => $commands)
     {
-      $commandsConfig[$name]['scriptname'] = $scriptname;
+      foreach ($commands as $commandName => $scriptname)
+      {
+        $components[$componentNameAndTag][$commandName]['scriptname'] = $scriptname;
+      }
     }
   }
 
