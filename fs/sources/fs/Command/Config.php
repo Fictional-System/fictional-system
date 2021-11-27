@@ -8,26 +8,30 @@ use RuntimeException;
 
 class Config extends ArrayObject
 {
-  private static int $version = 1;
+  const VERSION = 1;
 
-  private static array $template = [
+  const TEMPLATE = [
     1 => [
       'base' => [
         'version' => 1,
         'default' => [
-          'versions' => [
+          'from' => [],
+          'tags' => [
             'latest' => [
-              'from' => [],
+              'arguments' => [
+                'FROM_TAG' => 'latest',
+              ],
             ],
           ],
-          'arguments' => [],
-          'env' => [],
+          'arguments' => [
+            'FROM_TAG' => 'latest',
+          ],
           'volumes' => ['$PWD:/app'],
           'ports' => [],
           'interactive' => false,
           'detached' => false,
           'match-ids' => false,
-          'workdir' => '/app'
+          'workdir' => '/app',
         ],
         'commands' => [],
       ],
@@ -35,7 +39,72 @@ class Config extends ArrayObject
         'command' => '#command#',
         'enabled' => false,
       ],
+      'default' => [
+        'from' => [],
+        'arguments' => [],
+        'volumes' => [],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match-ids' => false,
+        'workdir' => '',
+      ],
     ],
+  ];
+
+  const FILTER_CONFIG_KEYS = [
+    'default' => [
+      'from',
+      'arguments',
+      'volumes',
+      'ports',
+      'interactive',
+      'detached',
+      'match-ids',
+      'workdir',
+    ],
+    'tag' => [
+      'arguments',
+      'volumes',
+      'ports',
+      'interactive',
+      'detached',
+      'match-ids',
+      'workdir',
+    ],
+    'command' => [
+      'volumes',
+      'ports',
+      'interactive',
+      'detached',
+      'match-ids',
+      'workdir',
+      'command',
+    ],
+    'final' => [
+      'from',
+      'arguments',
+      'volumes',
+      'ports',
+      'interactive',
+      'detached',
+      'match-ids',
+      'workdir',
+      'command',
+    ],
+    'cache' => [
+      'volumes',
+      'ports',
+      'interactive',
+      'detached',
+      'match-ids',
+      'workdir',
+      'command',
+    ]
+  ];
+
+  const CONFIG_MERGE_KEYS_VALUE = [
+    'arguments',
   ];
 
   /**
@@ -60,7 +129,7 @@ class Config extends ArrayObject
 
     parent::__construct(json_decode($content, true, 512, JSON_THROW_ON_ERROR));
 
-    if (self::$version > $this['version'])
+    if (self::VERSION > $this['version'])
     {
       // Migrate configuration;
     }
@@ -153,7 +222,7 @@ class Config extends ArrayObject
 
   public static function getTemplate(string $name): array
   {
-    $template = self::$template[1]['command'];
+    $template = self::TEMPLATE[1]['command'];
     $template['command'] = $name;
 
     return $template;
@@ -161,40 +230,95 @@ class Config extends ArrayObject
 
   public static function createTemplate(string $path): void
   {
-    self::write($path, self::$template[self::$version]['base']);
+    self::write($path, self::TEMPLATE[self::VERSION]['base']);
   }
 
   /**
    * @return string[]
    */
-  public function getVersions(string $cmd): array
+  public function getTags(string $cmd): array
   {
     if (!key_exists($cmd, $this['commands']))
     {
       throw new RuntimeException("Command `$cmd` not found.");
     }
 
-    $defaultVersions = array_keys($this['default']['versions']);
-    $commandVersions = key_exists('versions', $this['commands'][$cmd]) ? array_keys($this['commands'][$cmd]['versions']) : [];
+    $defaultVersions = array_keys($this['default']['tags']);
+    $commandVersions = key_exists('tags', $this['commands'][$cmd]) ? array_keys($this['commands'][$cmd]['tags']) : [];
 
     return array_merge($defaultVersions, $commandVersions);
   }
 
-  public function getVersionConfig(string $cmd, string $version): array
+  public function getTagConfig(string $cmd, string $tag): array
   {
-    if (!in_array($version, $this->getVersions($cmd)))
+    if (!in_array($tag, $this->getTags($cmd)))
     {
-      throw new RuntimeException("Version `$version` not found for command `$cmd`.");
+      throw new RuntimeException("Version `$tag` not found for command `$cmd`.");
     }
 
-    $config = $this['default'];
-    $config = array_merge($config, $this['commands'][$cmd], $config['versions'][$version]);
-    if (key_exists('versions', $this['commands'][$cmd]) && key_exists($version, $this['commands'][$cmd]['versions']))
+    $config = $this->filterConfig($this['default']);
+    $commandConfig = $this->filterConfig($this['commands'][$cmd], 'command');
+    $tagConfig = $this->filterConfig($this['default']['tags'][$tag], 'tag');
+    $commandTagConfig = [];
+    if (key_exists('tags', $this['commands'][$cmd]) && key_exists($tag, $this['commands'][$cmd]['tags']))
     {
-      $config = array_merge($config, $this['commands'][$cmd]['versions'][$version]);
+      $commandTagConfig = $this->filterConfig($this['commands'][$cmd]['tags'][$tag], 'tag');
     }
-    unset($config['versions'], $config['enabled']);
 
-    return $config;
+    $config = $this->mergeConfig($config, $commandConfig);
+    $config = $this->mergeConfig($config, $tagConfig);
+    $config = $this->mergeConfig($config, $commandTagConfig);
+
+    return $this->filterConfig($config, 'final', $this['version']);
+  }
+
+  private function filterConfig(array $arr, string $keysFilter = 'default', int $version = null): array
+  {
+    if (!key_exists($keysFilter, self::FILTER_CONFIG_KEYS))
+    {
+      throw new RuntimeException("Config keys filter `$keysFilter` does not exist.");
+    }
+
+    $arr = array_filter($arr, function ($key) use ($keysFilter) {
+      return in_array($key, self::FILTER_CONFIG_KEYS[$keysFilter]);
+    }, ARRAY_FILTER_USE_KEY);
+
+    if ($version !== null)
+    {
+      return array_merge(self::TEMPLATE[$version]['default'], $arr);
+    }
+
+    return $arr;
+  }
+
+  private function mergeConfig(array $arr, array $mergeArr): array
+  {
+    foreach ($mergeArr as $key => $fields)
+    {
+      if (in_array($key, self::CONFIG_MERGE_KEYS_VALUE))
+      {
+        foreach ($fields as $k => $v)
+        {
+          $arr[$key][$k] = $v;
+        }
+      }
+      else if (is_array($fields))
+      {
+        if (!key_exists($key, $arr))
+        {
+          $arr[$key] = $fields;
+        }
+        else
+        {
+          $arr[$key] = array_merge($arr[$key], $fields);
+        }
+      }
+      else
+      {
+        $arr[$key] = $fields;
+      }
+    }
+
+    return $arr;
   }
 }

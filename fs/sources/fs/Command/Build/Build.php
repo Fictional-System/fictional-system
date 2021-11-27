@@ -61,9 +61,9 @@ class Build extends Command
 
             foreach ($config->getEnabledCommands() as $command)
             {
-              foreach ($config->getVersions($command) as $version)
+              foreach ($config->getTags($command) as $version)
               {
-                $list["$domain/$component/$command:$version"] = $config->getVersionConfig($command, $version);
+                $list["$domain/$component/$command:$version"] = $config->getTagConfig($command, $version);
               }
             }
           }
@@ -71,6 +71,7 @@ class Build extends Command
       }
     }
 
+    //var_dump($list);
     return $list;
   }
 
@@ -80,6 +81,7 @@ class Build extends Command
 
     foreach ($list as $command => $config)
     {
+      $commandDeps = [];
       if (in_array($command, $depList))
       {
         continue;
@@ -99,7 +101,7 @@ class Build extends Command
         }
         $fullname = $this->getDepencyFullname($dep, $command);
 
-        if (in_array($fullname, $depList))
+        if (in_array($fullname, $commandDeps))
         {
           throw new RuntimeException("Circular dependency detected in `$fullname`.");
         }
@@ -109,7 +111,11 @@ class Build extends Command
           throw new RuntimeException("Command `$fullname` not found for `$command`.");
         }
 
-        $depList[] = $fullname;
+        if (!in_array($fullname, $depList))
+        {
+          $depList[] = $fullname;
+        }
+        $commandDeps[] = $fullname;
         $depConfig = $list[$fullname];
         if (key_exists('from', $depConfig))
         {
@@ -187,7 +193,7 @@ class Build extends Command
 
     foreach ($config['arguments'] as $argument => $value)
     {
-      $buildFile .= "argument=$argument:$value" . PHP_EOL;
+      $buildFile .= "argument=$argument $value" . PHP_EOL;
     }
     $buildFile .= 'build' . PHP_EOL;
 
@@ -236,18 +242,9 @@ class Build extends Command
     }, array_keys($list))));
 
     $list = array_map(function ($cmd) {
-      return array_filter($cmd, function ($key) {
-        return in_array($key, [
-          'env',
-          'volumes',
-          'ports',
-          'interactive',
-          'detached',
-          'match-ids',
-          'workdir',
-          'command',
-        ]);
-      }, ARRAY_FILTER_USE_KEY);
+      return array_filter($cmd, function ($value, $key) {
+        return in_array($key, Config::FILTER_CONFIG_KEYS['cache']);
+      }, ARRAY_FILTER_USE_BOTH);
     }, $list);
     if (
       @file_put_contents("$this->cwd/build.cache", trim($buildFile) . PHP_EOL, LOCK_EX) === false ||

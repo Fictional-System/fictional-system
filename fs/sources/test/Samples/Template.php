@@ -11,14 +11,18 @@ class Template extends ArrayObject
     1 => [
       'base' => [
         'version' => 1,
+        'from' => [],
         'default' => [
-          'versions' => [
+          'tags' => [
             'latest' => [
-              'from' => [],
+              'arguments' => [
+                'FROM_TAG' => 'latest',
+              ],
             ],
           ],
-          'arguments' => [],
-          'env' => [],
+          'arguments' => [
+            'FROM_TAG' => 'latest',
+          ],
           'volumes' => ['$PWD:/app'],
           'ports' => [],
           'interactive' => false,
