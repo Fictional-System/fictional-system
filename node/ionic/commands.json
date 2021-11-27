@@ -1,27 +1,31 @@
 {
     "version": 1,
     "default": {
-        "from": [],
+        "from": [
+            "node"
+        ],
         "tags": {
             "latest": {
                 "arguments": {
-                    "FROM_TAG": 16
+                    "FROM_TAG": "latest"
                 }
             }
         },
-        "arguments": [],
+        "arguments": {
+            "FROM_TAG": "latest"
+        },
         "volumes": [
             "$PWD:/app"
         ],
         "ports": [],
-        "interactive": true,
+        "interactive": false,
         "detached": false,
-        "match-ids": true,
+        "match-ids": false,
         "workdir": "/app"
     },
     "commands": {
-        "npm": {
-            "command": "npm",
+        "ionic": {
+            "command": "ionic",
             "enabled": false
         }
     }

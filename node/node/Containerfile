@@ -1,9 +1,7 @@
-ARG FROM=docker.io/library/node
-ARG VERSION=latest-alpine
-ARG GLOBAL=""
+ARG VERSION=latest
 ARG APK_DEP=""
 
-FROM ${FROM}:${VERSION}
+FROM docker.io/library/node:${FROM_TAG}-alpine
 
 USER root
 
