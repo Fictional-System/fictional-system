@@ -36,6 +36,9 @@ class Script
 
   public function getScript(): string
   {
+    [$domain, $component, $command] = explode('/', $this->name);
+    $imageName = $this->prefix . "/$domain/$component:" . $this->version;
+
     $name = 'fs_' .
       preg_replace('/[^A-Za-z0-9.]/', '_', $this->name) .
       '_' .
@@ -51,8 +54,8 @@ class Script
     {
       $cmdline[] = "-v $volume:z";
     }
-    $cmdline[] = $this->prefix . '/' . $this->name . ':' . $this->version;
-    $cmdline[] = $this->command;
+    $cmdline[] = $imageName;
+    $this->command ?? $cmdline[] = $this->command;
     $cmdline[] = '$*';
 
     return '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL;

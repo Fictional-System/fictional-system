@@ -11,8 +11,8 @@ class Template extends ArrayObject
     1 => [
       'base' => [
         'version' => 1,
-        'from' => [],
         'default' => [
+          'from' => [],
           'tags' => [
             'latest' => [
               'arguments' => [

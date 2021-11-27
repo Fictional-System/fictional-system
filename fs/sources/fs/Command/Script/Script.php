@@ -63,37 +63,41 @@ class Script extends Command
   {
     try
     {
-      $commands = json_decode(file_get_contents("$this->cwd/commands.cache"), true, 512, JSON_THROW_ON_ERROR);
+      $component = json_decode(file_get_contents("$this->cwd/commands.cache"), true, 512, JSON_THROW_ON_ERROR);
     }
     catch (JsonException $ex)
     {
       throw new RuntimeException('Syntax error in `commands.cache`.', 0, $ex);
     }
 
-    $this->completeScriptsName($commands);
+    $this->completeScriptsName($component);
     $count = 0;
-    foreach ($commands as $name => $config)
+    foreach ($component as $componentNameAndTag => $commands)
     {
-      if (!$this->all)
+      [$componentFullName, $componentTag] = explode(':', $componentNameAndTag);
+      foreach ($commands as $commandName => $command)
       {
-        $bypass = true;
-        foreach ($this->argv as $cmd)
+        if (!$this->all)
         {
-          if (str_starts_with($name, $cmd))
+          $bypass = true;
+          foreach ($this->argv as $cmd)
           {
-            $bypass = false;
-            break;
+            if (str_starts_with("$componentFullName/$commandName:$componentTag", $cmd))
+            {
+              $bypass = false;
+              break;
+            }
+          }
+
+          if ($bypass)
+          {
+            continue;
           }
         }
 
-        if ($bypass)
-        {
-          continue;
-        }
+        $this->generateCommandScript("$componentFullName/$commandName:$componentTag", $command);
+        $count++;
       }
-
-      $this->generateCommandScript($name, $config);
-      $count++;
     }
 
     echo "$count scripts generated." . PHP_EOL;
@@ -101,16 +105,26 @@ class Script extends Command
 
   private function completeScriptsName(array &$commandsConfig)
   {
+    var_dump($commandsConfig);
+    foreach ($commandsConfig as $name => $commands)
+    {
+      foreach ($commands as $command => $config)
+      {
+
+      }
+    }
+
+
     $simplesCommand = [];
     $componentsCommand = [];
     $scriptnames = [];
 
     foreach ($commandsConfig as $name => $config)
     {
-      [$longName, $version] = explode(':', $name);
+      [$longName, $tag] = explode(':', $name);
       [$domain, $component, $command] = explode('/', $longName);
-      $simplesCommand[$command][] = "$domain/$component/$command:$version";
-      $componentsCommand["$component/$command"][] = "$domain/$component/$command:$version";
+      $simplesCommand[$command][] = "$domain/$component/$command:$tag";
+      $componentsCommand["$component/$command"][] = "$domain/$component/$command:$tag";
     }
 
     foreach ($simplesCommand as $name => $commands)
@@ -119,7 +133,7 @@ class Script extends Command
       {
         foreach ($commands as $commandName)
         {
-          [$longName, $version] = explode(':', $commandName);
+          [$longName, $tag] = explode(':', $commandName);
           [$domain, $component, $command] = explode('/', $longName);
           $scriptnames[$commandName] = $this->cleanName("$component/$command");
         }
@@ -132,7 +146,7 @@ class Script extends Command
       {
         foreach ($commands as $commandName)
         {
-          [$longName, $version] = explode(':', $commandName);
+          [$longName, $tag] = explode(':', $commandName);
           [$domain, $component, $command] = explode('/', $longName);
           $scriptnames[$commandName] = $this->cleanName("$domain/$component/$command");
         }
@@ -150,45 +164,46 @@ class Script extends Command
     return preg_replace('/[^A-Za-z0-9.]/', '_', $name);
   }
 
-  private function cleanVersion(string $version): string
+  private function cleanVersion(string $tag): string
   {
-    return preg_replace('/[^A-Za-z0-9]/', '_', $version);
+    return preg_replace('/[^A-Za-z0-9]/', '_', $tag);
   }
 
-  private function generateCommandScript(string $command, array $config): void
+  private function generateCommandScript(string $commandName, array $config): void
   {
     $cmdline = ['podman run --rm'];
 
     $this->getValue($config, 'interactive', false) ?? $cmdline[] = '-it';
     $this->getValue($config, 'detached', false) ?? $cmdline[] = '-d';
     $this->getValue($config, 'maths_ids', false) ?? $cmdline[] = '--userns=keep-id';
-    $this->getValue($config, 'workdir', '') ?? $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
+    $this->getValue($config, 'workdir', false) ?? $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
 
-    [$longName, $version] = explode(':', $command);
+    [$longName, $tag] = explode(':', $commandName);
+    [$domain, $component, $command] = explode('/', $longName);
     $name = 'fs_' .
       $this->cleanName($longName) .
       '_' .
-      $this->cleanVersion($version);
+      $this->cleanVersion($tag);
 
     $cmdline[] = '--name ' . $name . '_$$';
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
       if (count(explode(':', $volume)) !== 2)
       {
-        throw new RuntimeException("Bad format in volumes definition for `$command`.");
+        throw new RuntimeException("Bad format in volumes definition for `$commandName`.");
       }
 
       $cmdline[] = "-v $volume:z";
     }
-    $cmdline[] = $this->prefix . "/$longName:$version";
-    $cmdline[] = $this->getValue($config, 'command', '');
+    $cmdline[] = $this->prefix . "/$domain/$component:$tag";
+    $this->getValue($config, 'command', false) ?? $cmdline[] = $this->getValue($config, 'command');
     $cmdline[] = '$*';
 
     $scriptname = $this->getValue(
         $config,
         'scriptname',
-        $this->cleanName(explode('/', $longName)[2])) .
-      ($version !== 'latest') ?? '_' . $this->cleanVersion($version);
+        $this->cleanName($command)) .
+      ($tag !== 'latest') ?? '_' . $this->cleanVersion($tag);
     $this->write(
       $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);
