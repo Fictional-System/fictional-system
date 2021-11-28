@@ -85,7 +85,7 @@ class Script
     }
     foreach ($this->volumes as $volume)
     {
-      $cmdline[] = "-v $volume:z";
+      $cmdline[] = "-v $volume";
     }
     $cmdline[] = $imageName;
     !$this->command ?: $cmdline[] = $this->command;

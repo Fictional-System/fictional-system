@@ -38,13 +38,13 @@ Tester::it('Generate all scripts', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -59,13 +59,13 @@ Tester::it('Duplicate command in same domain', function (ITest $tester): void {
   $tester->assertFileExist('bin/bar_test');
   $tester->assertFileContent('bin/bar_test',
     Script::get('foo/bar/test', 'latest', 'test')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
   $tester->assertFileExist('bin/foo_test');
   $tester->assertFileContent('bin/foo_test',
     Script::get('foo/foo/test', 'latest', 'test')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -80,13 +80,13 @@ Tester::it('Duplicate command in other domain', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo_bar_test');
   $tester->assertFileContent('bin/foo_bar_test',
     Script::get('foo/bar/test', 'latest', 'test')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar_bar_test');
   $tester->assertFileContent('bin/bar_bar_test',
     Script::get('bar/bar/test', 'latest', 'test')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -102,14 +102,14 @@ Tester::it('Use env file', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->addEnvFile('/app/foo/bar/cache/foo.env')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -128,14 +128,14 @@ Tester::it('Script interactive', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->setInteractive(true)
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -154,14 +154,14 @@ Tester::it('Script detached', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->setDetached(true)
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -180,14 +180,14 @@ Tester::it('Script matchid', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->setMatchIds(true)
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });
@@ -206,14 +206,14 @@ Tester::it('Script workdir', function (ITest $tester): void {
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->setWorkdir('')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
   $tester->assertFileContent('bin/bar',
     Script::get('foo/bar/bar', 'latest', 'bar')
-      ->addVolume('$PWD:/app')
+      ->addVolume('$PWD:/app:z')
       ->getScript()
   );
 });

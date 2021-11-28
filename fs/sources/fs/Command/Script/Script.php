@@ -185,12 +185,16 @@ class Script extends Command
     !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
-      if (count(explode(':', $volume)) !== 2)
+      switch (count(explode(':', $volume)))
       {
-        throw new RuntimeException("Bad format in volumes definition for `$commandName`.");
+        case 2:
+        case 3:
+          break;
+        default:
+          throw new RuntimeException("Bad format in volumes definition for `$commandName`.");
       }
 
-      $cmdline[] = "-v $volume:z";
+      $cmdline[] = "-v $volume";
     }
     $cmdline[] = $this->prefix . "/$domain/$component:$tag";
     !$this->getValue($config, 'command', false) ?: $cmdline[] = $this->getValue($config, 'command');

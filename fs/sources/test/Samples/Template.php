@@ -23,7 +23,7 @@ class Template extends ArrayObject
           'arguments' => [
             'FROM_TAG' => 'latest',
           ],
-          'volumes' => ['$PWD:/app'],
+          'volumes' => ['$PWD:/app:z'],
           'ports' => [],
           'interactive' => false,
           'detached' => false,

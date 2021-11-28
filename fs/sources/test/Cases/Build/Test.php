@@ -31,7 +31,7 @@ Tester::it('Simple build', function (ITest $tester): void {
     'foo/bar:latest' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -65,7 +65,7 @@ Tester::it('Complete build', function (ITest $tester): void {
     'foo/bar:latest' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -103,7 +103,7 @@ Tester::it('Multiple build', function (ITest $tester): void {
     'foo/bar:latest' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -114,7 +114,7 @@ Tester::it('Multiple build', function (ITest $tester): void {
       ],
       'foo' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -127,7 +127,7 @@ Tester::it('Multiple build', function (ITest $tester): void {
     'test/bar:latest' => [
       'bar' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -188,7 +188,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
     'foo/bar:latest' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -199,7 +199,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
       ],
       'foo' => [
         'volumes' => [
-          '$PWD:/app',
+          '$PWD:/app:z',
           'foo:/app',
         ],
         'ports' => [],
@@ -211,7 +211,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
       ],
       'bar' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => true,
@@ -224,7 +224,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
     'foo/bar:before' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app',
+          '$PWD:/app:z',
           'test:test',
         ],
         'ports' => [],
@@ -236,7 +236,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
       ],
       'foo' => [
         'volumes' => [
-          '$PWD:/app',
+          '$PWD:/app:z',
           'foo:/app',
           'test:test',
           'old:old'
@@ -250,7 +250,7 @@ Tester::it('Multiple build override parameters', function (ITest $tester): void 
       ],
       'bar' => [
         'volumes' => [
-          '$PWD:/app',
+          '$PWD:/app:z',
           'test:test',
         ],
         'ports' => [],
@@ -288,7 +288,7 @@ Tester::it('Simple dependency', function (ITest $tester): void {
     'foo/bar:latest' => [
       'bar' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -301,7 +301,7 @@ Tester::it('Simple dependency', function (ITest $tester): void {
     'foo/foo:latest' => [
       'foo' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -345,7 +345,7 @@ Tester::it('Multi Level dependency', function (ITest $tester): void {
     'foo/bar:latest' => [
       'bar' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -358,7 +358,7 @@ Tester::it('Multi Level dependency', function (ITest $tester): void {
     'foo/foo:latest' => [
       'foo' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
@@ -371,7 +371,7 @@ Tester::it('Multi Level dependency', function (ITest $tester): void {
     'foo/test:latest' => [
       'test' => [
         'volumes' => [
-          '$PWD:/app'
+          '$PWD:/app:z'
         ],
         'ports' => [],
         'interactive' => false,
