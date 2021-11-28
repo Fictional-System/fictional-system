@@ -115,17 +115,105 @@ Tester::it('Use env file', function (ITest $tester): void {
 });
 
 Tester::it('Script interactive', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
 
+  $config = new Config('foo/bar/commands.json');
+  $config['commands']['foo']['interactive'] = true;
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app')
+      ->setInteractive(true)
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
 });
 
 Tester::it('Script detached', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
 
+  $config = new Config('foo/bar/commands.json');
+  $config['commands']['foo']['detached'] = true;
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app')
+      ->setDetached(true)
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
 });
 
 Tester::it('Script matchid', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
 
+  $config = new Config('foo/bar/commands.json');
+  $config['commands']['foo']['match_ids'] = true;
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app')
+      ->setMatchIds(true)
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
 });
 
 Tester::it('Script workdir', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
 
+  $config = new Config('foo/bar/commands.json');
+  $config['commands']['foo']['workdir'] = '';
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app')
+      ->setWorkdir('')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
 });
