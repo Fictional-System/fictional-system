@@ -106,6 +106,11 @@ class FileWrapper
     }
   }
 
+  public function fileExists(string $path): bool
+  {
+    return file_exists($this->cwd . '/' . $path);
+  }
+
   public function mkdir(string $path): void
   {
     if (@mkdir($this->cwd . '/' . $path, 0700, true) === false)
