@@ -169,10 +169,10 @@ class Script extends Command
   {
     $cmdline = ['podman run --rm'];
 
-    $this->getValue($config, 'interactive', false) ?? $cmdline[] = '-it';
-    $this->getValue($config, 'detached', false) ?? $cmdline[] = '-d';
-    $this->getValue($config, 'maths_ids', false) ?? $cmdline[] = '--userns=keep-id';
-    $this->getValue($config, 'workdir', false) ?? $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
+    !$this->getValue($config, 'interactive', false) ?: $cmdline[] = '-it';
+    !$this->getValue($config, 'detached', false) ?: $cmdline[] = '-d';
+    !$this->getValue($config, 'match_ids', false) ?: $cmdline[] = '--userns=keep-id';
+    !$this->getValue($config, 'workdir', false) ?: $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
 
     [$longName, $tag] = explode(':', $commandName);
     [$domain, $component, $command] = explode('/', $longName);
@@ -193,14 +193,14 @@ class Script extends Command
       $cmdline[] = "-v $volume:z";
     }
     $cmdline[] = $this->prefix . "/$domain/$component:$tag";
-    $this->getValue($config, 'command', false) ?? $cmdline[] = $this->getValue($config, 'command');
+    !$this->getValue($config, 'command', false) ?: $cmdline[] = $this->getValue($config, 'command');
     $cmdline[] = '$*';
 
     $scriptname = $this->getValue(
         $config,
         'scriptname',
         $this->cleanName($command)) .
-      ($tag !== 'latest') ?? '_' . $this->cleanVersion($tag);
+      (($tag === 'latest') ? '' : '_' . $this->cleanVersion($tag));
     $this->write(
       $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);

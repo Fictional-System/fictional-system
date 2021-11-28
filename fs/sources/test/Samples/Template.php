@@ -27,7 +27,7 @@ class Template extends ArrayObject
           'ports' => [],
           'interactive' => false,
           'detached' => false,
-          'match-ids' => false,
+          'match_ids' => false,
           'workdir' => '/app'
         ],
         'commands' => [],

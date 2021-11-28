@@ -5,7 +5,7 @@ namespace Samples;
 class Script
 {
   private string $prefix = 'localhost/fs';
-  private string $workdir = '';
+  private string $workdir = '/app';
   private array $volumes = [];
   private array $envs = [];
   private bool $interactive = false;
@@ -24,6 +24,27 @@ class Script
   public function addVolume(string $volume): Script
   {
     $this->volumes[] = $volume;
+
+    return $this;
+  }
+
+  public function setInteractive(bool $interactive): Script
+  {
+    $this->interactive = $interactive;
+
+    return $this;
+  }
+
+  public function setMatchIds(bool $maths_ids): Script
+  {
+    $this->maths_ids = $maths_ids;
+
+    return $this;
+  }
+
+  public function setDetached(bool $detached): Script
+  {
+    $this->detached = $detached;
 
     return $this;
   }
@@ -53,10 +74,10 @@ class Script
       preg_replace('/[^A-Za-z0-9]/', '_', $this->version);
 
     $cmdline = ['podman run --rm'];
-    $this->interactive ?? $cmdline[] = '-it';
-    $this->detached ?? $cmdline[] = '-d';
-    $this->maths_ids ?? $cmdline[] = '--userns=keep-id';
-    $this->workdir !== '' ?? $cmdline[] = '-w ' . $this->workdir;
+    !$this->interactive ?: $cmdline[] = '-it';
+    !$this->detached ?: $cmdline[] = '-d';
+    !$this->maths_ids ?: $cmdline[] = '--userns=keep-id';
+    $this->workdir == '' ?: $cmdline[] = '-w ' . $this->workdir;
     $cmdline[] = '--name ' . $name . '_$$';
     foreach ($this->envs as $env)
     {
@@ -67,7 +88,7 @@ class Script
       $cmdline[] = "-v $volume:z";
     }
     $cmdline[] = $imageName;
-    $this->command ?? $cmdline[] = $this->command;
+    !$this->command ?: $cmdline[] = $this->command;
     $cmdline[] = '$*';
 
     return '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL;
