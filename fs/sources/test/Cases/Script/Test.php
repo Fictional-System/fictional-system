@@ -90,3 +90,42 @@ Tester::it('Duplicate command in other domain', function (ITest $tester): void {
       ->getScript()
   );
 });
+
+Tester::it('Use env file', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+  file_put_contents('foo/bar/files/foo.env', 'FOO=bar');
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app')
+      ->addEnvFile('/app/foo/bar/cache/foo.env')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app')
+      ->getScript()
+  );
+});
+
+Tester::it('Script interactive', function (ITest $tester): void {
+
+});
+
+Tester::it('Script detached', function (ITest $tester): void {
+
+});
+
+Tester::it('Script matchid', function (ITest $tester): void {
+
+});
+
+Tester::it('Script workdir', function (ITest $tester): void {
+
+});

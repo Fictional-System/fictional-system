@@ -7,6 +7,7 @@ class Script
   private string $prefix = 'localhost/fs';
   private string $workdir = '';
   private array $volumes = [];
+  private array $envs = [];
   private bool $interactive = false;
   private bool $maths_ids = false;
   private bool $detached = false;
@@ -34,6 +35,13 @@ class Script
     return $this;
   }
 
+  public function addEnvFile(string $file): Script
+  {
+    $this->envs[] = $file;
+
+    return $this;
+  }
+
   public function getScript(): string
   {
     [$domain, $component, $command] = explode('/', $this->name);
@@ -50,6 +58,10 @@ class Script
     $this->maths_ids ?? $cmdline[] = '--userns=keep-id';
     $this->workdir !== '' ?? $cmdline[] = '-w ' . $this->workdir;
     $cmdline[] = '--name ' . $name . '_$$';
+    foreach ($this->envs as $env)
+    {
+      $cmdline[] = "--env-file $env";
+    }
     foreach ($this->volumes as $volume)
     {
       $cmdline[] = "-v $volume:z";

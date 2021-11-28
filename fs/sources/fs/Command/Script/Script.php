@@ -115,8 +115,8 @@ class Script extends Command
       [$domainName, $componentName] = explode('/', $componentFullName);
       foreach ($commands as $commandName => $command)
       {
-          $simplesCommand[$commandName][] = "$domainName/$componentName/$commandName:$componentTag";
-          $componentsCommand["$componentName/$commandName"][] = "$domainName/$componentName/$commandName:$componentTag";
+        $simplesCommand[$commandName][] = "$domainName/$componentName/$commandName:$componentTag";
+        $componentsCommand["$componentName/$commandName"][] = "$domainName/$componentName/$commandName:$componentTag";
       }
     }
 
@@ -182,6 +182,7 @@ class Script extends Command
       $this->cleanVersion($tag);
 
     $cmdline[] = '--name ' . $name . '_$$';
+    !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
       if (count(explode(':', $volume)) !== 2)

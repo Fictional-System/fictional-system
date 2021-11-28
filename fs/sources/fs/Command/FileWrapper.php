@@ -87,12 +87,12 @@ class FileWrapper
 
   public function exists(string $path): bool
   {
-    return file_exists($this->cwd . '/' . $path);
+    return file_exists($this->absolutePath($path));
   }
 
   public function fileGetContent(string $path): void
   {
-    if (@file_get_contents($this->cwd . '/' . $path) === false)
+    if (@file_get_contents($this->absolutePath($path)) === false)
     {
       throw new RuntimeException("Unable to get file `$path`.");
     }
@@ -100,7 +100,7 @@ class FileWrapper
 
   public function filePutContent(string $path, string $content, int $flags = 0): void
   {
-    if (@file_put_contents($this->cwd . '/' . $path, $content, $flags) === false)
+    if (@file_put_contents($this->absolutePath($path), $content, $flags) === false)
     {
       throw new RuntimeException("Unable to put file `$path`.");
     }
@@ -108,12 +108,17 @@ class FileWrapper
 
   public function fileExists(string $path): bool
   {
-    return file_exists($this->cwd . '/' . $path);
+    return file_exists($this->absolutePath($path));
+  }
+
+  public function absolutePath(string $path): string
+  {
+    return $this->cwd . '/' . $path;
   }
 
   public function mkdir(string $path): void
   {
-    if (@mkdir($this->cwd . '/' . $path, 0700, true) === false)
+    if (@mkdir($this->absolutePath($path), 0700, true) === false)
     {
       throw new RuntimeException("Unable to create `$path`.");
     }
@@ -121,7 +126,7 @@ class FileWrapper
 
   public function rmdir(string $path): void
   {
-    if (@rmdir($this->cwd . '/' . $path) === false)
+    if (@rmdir($this->absolutePath($path)) === false)
     {
       throw new RuntimeException("Unable to delete `$path`.");
     }
@@ -129,7 +134,7 @@ class FileWrapper
 
   public function unlink(string $path): void
   {
-    if (@unlink($this->cwd . '/' . $path) === false)
+    if (@unlink($this->absolutePath($path)) === false)
     {
       throw new RuntimeException("Unable to delete `$path`.");
     }
@@ -137,17 +142,17 @@ class FileWrapper
 
   public function scandir(string $path): array|false
   {
-    return scandir($this->cwd . '/' . $path);
+    return scandir($this->absolutePath($path));
   }
 
   public function isDir(string $path): bool
   {
-    return is_dir($this->cwd . '/' . $path);
+    return is_dir($this->absolutePath($path));
   }
 
   public function copyFile(string $sourcePath, string $targetPath)
   {
-    if (!@copy($this->cwd . '/' . $sourcePath, $this->cwd . '/' . $targetPath))
+    if (!@copy($this->absolutePath($sourcePath), $this->absolutePath($targetPath)))
     {
       throw new RuntimeException("Unable to copy `$sourcePath` to `$targetPath`.");
     }
