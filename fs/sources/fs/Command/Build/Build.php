@@ -5,6 +5,7 @@ namespace Command\Build;
 use Command\Command;
 use Command\Config;
 use Command\FileWrapper;
+use Command\Script\Script;
 use RuntimeException;
 
 class Build extends Command

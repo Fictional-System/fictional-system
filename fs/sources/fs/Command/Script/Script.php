@@ -3,6 +3,7 @@
 namespace Command\Script;
 
 use Command\Command;
+use Command\Config;
 use JsonException;
 use RuntimeException;
 
@@ -128,7 +129,7 @@ class Script extends Command
         {
           [$commandFullName, $tag] = explode(':', $fullName);
           [$domainName, $componentName, $commandName] = explode('/', $commandFullName);
-          $scriptnames["$domainName/$componentName:$tag"][$commandName] = $this->cleanName("$componentName/$commandName");
+          $scriptnames["$domainName/$componentName:$tag"][$commandName] = Config::cleanName("$componentName/$commandName");
         }
       }
     }
@@ -141,7 +142,7 @@ class Script extends Command
         {
           [$commandFullName, $tag] = explode(':', $fullName);
           [$domainName, $componentName, $commandName] = explode('/', $commandFullName);
-          $scriptnames["$domainName/$componentName:$tag"][$commandName] = $this->cleanName("$domainName/$componentName/$commandName");
+          $scriptnames["$domainName/$componentName:$tag"][$commandName] = Config::cleanName("$domainName/$componentName/$commandName");
         }
       }
     }
@@ -153,16 +154,6 @@ class Script extends Command
         $components[$componentNameAndTag][$commandName]['scriptname'] = $scriptname;
       }
     }
-  }
-
-  private function cleanName(string $name): string
-  {
-    return preg_replace('/[^A-Za-z0-9.]/', '_', $name);
-  }
-
-  private function cleanVersion(string $tag): string
-  {
-    return preg_replace('/[^A-Za-z0-9]/', '_', $tag);
   }
 
   private function generateCommandScript(string $commandName, array $config): void
@@ -177,9 +168,9 @@ class Script extends Command
     [$longName, $tag] = explode(':', $commandName);
     [$domain, $component, $command] = explode('/', $longName);
     $name = 'fs_' .
-      $this->cleanName($longName) .
+      Config::cleanName($longName) .
       '_' .
-      $this->cleanVersion($tag);
+      Config::cleanTag($tag);
 
     $cmdline[] = '--name ' . $name . '_$$';
     !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
@@ -203,8 +194,8 @@ class Script extends Command
     $scriptname = $this->getValue(
         $config,
         'scriptname',
-        $this->cleanName($command)) .
-      (($tag === 'latest') ? '' : '_' . $this->cleanVersion($tag));
+        Config::cleanName($command)) .
+      (($tag === 'latest') ? '' : '_' . Config::cleanTag($tag));
     $this->write(
       $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);

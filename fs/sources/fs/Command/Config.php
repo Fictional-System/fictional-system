@@ -325,4 +325,14 @@ class Config extends ArrayObject
 
     return $arr;
   }
+
+  public static function cleanName(string $name): string
+  {
+    return preg_replace('/[^A-Za-z0-9.]/', '_', $name);
+  }
+
+  public static function cleanTag(string $tag): string
+  {
+    return preg_replace('/[^A-Za-z0-9]/', '_', $tag);
+  }
 }
