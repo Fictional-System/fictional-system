@@ -1,6 +1,49 @@
 #!/bin/sh
 
+prefix="localhost/fs"
+
+fs_build()
+{
+  image_name=""
+  image_tag=""
+  image_args=""
+  while IFS="=" read -r key value
+  do
+    if [ "$key" = "name" ]
+    then
+      image_name="$value"
+    elif [ "$key" = "tag" ]
+    then
+      image_tag="$value"
+    elif [ "$key" = "argument" ]
+    then
+      IFS=" " read -r argKey argValue <<< $value
+      image_args="$image_args --build-arg $argKey=\"$argValue\""
+    elif [ "$key" = "build" ]
+    then
+      cmd="podman build -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${image_name}/Containerfile ${image_name}/cache"
+      $cmd
+      image_name=""
+      image_tag=""
+      image_args=""
+    fi
+  done < "build.cache"
+}
+
 dir=$(dirname $(dirname "$0"))
 name="localhost/fs/fs/fs"
 
+fs_build
+
+exit
+
 podman run --rm -it --userns=keep-id --name fs_dev_$$ -v ${dir}:/app:z ${name} php /usr/local/bin/fs.phar $*
+LAST_COMMAND=$?
+
+if [ "$1" = "build" ]
+then
+  if [ $LAST_COMMAND -eq 0 ]
+  then
+    fs_build
+  fi
+fi
