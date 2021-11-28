@@ -65,7 +65,7 @@ class Script
 
   public function getScript(): string
   {
-    [$domain, $component, $command] = explode('/', $this->name);
+    [$domain, $component] = explode('/', $this->name);
     $imageName = $this->prefix . "/$domain/$component:" . $this->version;
 
     $name = 'fs_' .

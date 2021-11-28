@@ -105,7 +105,7 @@ class Build extends Command
         {
           throw new RuntimeException("Dependency `$dep` in `$component` is not a valid dependency.");
         }
-        $fullname = $this->getDepencyFullname($dep, $component);
+        $fullname = $this->getDependencyFullname($dep, $component);
         if (in_array($fullname, $componentDeps))
         {
           throw new RuntimeException("Circular dependency detected in `$component`.");
@@ -154,7 +154,7 @@ class Build extends Command
     return true;
   }
 
-  private function getDepencyFullname(string $name, string $parent): string
+  private function getDependencyFullname(string $name, string $parent): string
   {
     [$longName, $tag] = explode(':', $parent);
     $domain = explode('/', $longName)[0];
@@ -188,7 +188,7 @@ class Build extends Command
     {
       foreach ($config['from'] as $dependency)
       {
-        $buildFile .= $this->buildComponent($list, $this->getDepencyFullname($dependency, $component), $built);
+        $buildFile .= $this->buildComponent($list, $this->getDependencyFullname($dependency, $component), $built);
       }
     }
 

@@ -2,10 +2,12 @@
 
 namespace Tester;
 
+use RuntimeException;
+
 class Test implements ITest
 {
   private array $errors = [];
-  private string $output = "";
+  private string $output = '';
   private bool $dev = false;
 
   public function __construct(private string $name, private $cb)
@@ -193,7 +195,7 @@ class Test implements ITest
   {
     if (@mkdir($dir, 0700, true) === false)
     {
-      throw new \RuntimeException("Unable to create `$dir`.");
+      throw new RuntimeException("Unable to create `$dir`.");
     }
   }
 }

@@ -120,7 +120,7 @@ class Script extends Command
       }
     }
 
-    foreach ($simplesCommand as $name => $commands)
+    foreach ($simplesCommand as $commands)
     {
       if (count($commands) > 1)
       {
@@ -133,7 +133,7 @@ class Script extends Command
       }
     }
 
-    foreach ($componentsCommand as $name => $commands)
+    foreach ($componentsCommand as $commands)
     {
       if (count($commands) > 1)
       {
@@ -206,7 +206,7 @@ class Script extends Command
       '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);
   }
 
-  private function getValue(&$config, $key, $default = ''): mixed
+  private function getValue($config, $key, $default = ''): mixed
   {
     if (key_exists($key, $config))
     {

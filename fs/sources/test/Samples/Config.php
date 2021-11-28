@@ -35,7 +35,7 @@ class Config extends ArrayObject
   {
     if (($config = json_encode($this->getArrayCopy(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) === false)
     {
-      throw new RuntimeException("Config encode error.");
+      throw new RuntimeException('Config encode error.');
     }
 
     if (file_put_contents($this->path, $config . PHP_EOL) === false)

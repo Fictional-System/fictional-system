@@ -40,7 +40,7 @@ class Disable extends SwitchStatus
 
     foreach ($this->argv as $name)
     {
-      call_user_func_array([$this, 'switch'], array_merge([false], explode('/', $name)));
+      $this->switch(...array_merge([false], explode('/', $name)));
     }
   }
 }

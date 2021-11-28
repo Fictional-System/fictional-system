@@ -213,7 +213,7 @@ class Config extends ArrayObject
   {
     if (($config = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) === false)
     {
-      throw new RuntimeException("Config encode error.");
+      throw new RuntimeException('Config encode error.');
     }
 
     if (@file_put_contents($path, $config . PHP_EOL) === false)
@@ -255,7 +255,7 @@ class Config extends ArrayObject
 
   public function getTagConfig(string $cmd, string $tag): array
   {
-    if (!in_array($tag, $this->getTags($cmd)))
+    if (!in_array($tag, $this->getTags()))
     {
       throw new RuntimeException("Version `$tag` not found for command `$cmd`.");
     }

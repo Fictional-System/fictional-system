@@ -80,7 +80,7 @@ abstract class Command implements IUsage
       }
       echo PHP_EOL;
     }
-    throw new \RuntimeException(ob_get_clean());
+    throw new RuntimeException(ob_get_clean());
   }
 
   /**

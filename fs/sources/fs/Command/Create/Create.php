@@ -42,7 +42,7 @@ class Create extends Command
 
     foreach ($this->argv as $name)
     {
-      call_user_func_array([$this, 'createDomain'], explode('/', $name));
+      $this->createDomain(...explode('/', $name));
     }
   }
 
@@ -129,7 +129,7 @@ class Create extends Command
     }
   }
 
-  private function createFile(string $file, bool $force = false, string $content = ""): void
+  private function createFile(string $file, bool $force = false, string $content = ''): void
   {
     if (file_exists($file))
     {
