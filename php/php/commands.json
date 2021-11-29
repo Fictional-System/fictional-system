@@ -5,7 +5,7 @@
             "latest": {
                 "from": [],
                 "arguments": {
-                    "FROM_TAG": "8-cli-alpine"
+                    "FROM_TAG": "8"
                 }
             }
         },

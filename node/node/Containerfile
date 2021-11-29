@@ -1,4 +1,4 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
 ARG APK_DEP=""
 
 FROM docker.io/library/node:${FROM_TAG}-alpine
@@ -6,8 +6,6 @@ FROM docker.io/library/node:${FROM_TAG}-alpine
 USER root
 
 RUN apk add --no-cache git ${APK_DEP}
-
-RUN [ $(echo ${GLOBAL} | wc -m) -eq 0 ] || npm install -g ${GLOBAL}
 
 RUN mkdir /app
 WORKDIR /app

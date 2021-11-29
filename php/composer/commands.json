@@ -12,7 +12,7 @@
             }
         },
         "arguments": {
-            "APK_ADD": "git zip",
+            "APK_ADD": "",
             "APK_TEMP_ADD": "libzip-dev",
             "DOCKER_PHP_EXT_INSTALL": "zip"
         },
