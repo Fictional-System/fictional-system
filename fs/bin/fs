@@ -1,41 +1,69 @@
 #!/bin/sh
 
+dir=$(dirname $(dirname "$0"))
 prefix="localhost/fs"
 
 fs_build()
 {
+  build=0
   image_name=""
   image_tag=""
   image_args=""
   while IFS="=" read -r key value
   do
-    if [ "$key" = "name" ]
+    if [ "${key}" = "name" ]
     then
       image_name="$value"
-    elif [ "$key" = "tag" ]
+    elif [ "${key}" = "tag" ]
     then
       image_tag="$value"
-    elif [ "$key" = "argument" ]
+    elif [ "${key}" = "argument" ]
     then
       IFS=" " read -r argKey argValue <<< $value
-      image_args="$image_args --build-arg $argKey=\"$argValue\""
-    elif [ "$key" = "build" ]
+      image_args="${image_args} --build-arg ${argKey}=${argValue}"
+    elif [ "${key}" = "build" ]
     then
-      cmd="podman build -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${image_name}/Containerfile ${image_name}/cache"
+      quiet="-q"
+      if [ "${1}" = "dev" ]
+      then
+        quiet=""
+      fi
+
+      cmd="podman build ${quiet} -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${image_name}/Containerfile ${image_name}/cache"
+
+      echo "Building ${image_name}:${image_tag}"
+      if [ "${1}" = "dev" ]
+      then
+        echo $cmd
+      fi
       $cmd
+      LAST_COMMAND=$?
+      
+      if [ $LAST_COMMAND -ne 0 ]
+      then
+        exit $LAST_COMMAND
+      fi
+      echo "Done."
+      echo ""
+
       image_name=""
       image_tag=""
       image_args=""
+      build=$((build+1))
     fi
   done < "build.cache"
+
+  if [ $build -gt 0 ]
+  then
+    echo "${build} components built."
+    fs script all
+    chmod +x ${dir}/bin/*
+    echo ""
+    echo "Enjoy your FS :)"
+  fi
 }
 
-dir=$(dirname $(dirname "$0"))
 name="localhost/fs/fs/fs"
-
-fs_build
-
-exit
 
 podman run --rm -it --userns=keep-id --name fs_dev_$$ -v ${dir}:/app:z ${name} php /usr/local/bin/fs.phar $*
 LAST_COMMAND=$?
@@ -44,6 +72,6 @@ if [ "$1" = "build" ]
 then
   if [ $LAST_COMMAND -eq 0 ]
   then
-    fs_build
+    fs_build $2
   fi
 fi
