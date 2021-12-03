@@ -9,12 +9,14 @@ use RuntimeException;
 abstract class Command implements IUsage
 {
   protected string $cwd;
+  protected FileWrapper $fw;
 
   public function __construct(protected int $argc, protected array $argv)
   {
     $this->argc--;
     array_shift($this->argv);
     $this->cwd = getcwd();
+    $this->fw = new FileWrapper(getcwd());
   }
 
   /**
@@ -78,7 +80,7 @@ abstract class Command implements IUsage
       }
       echo PHP_EOL;
     }
-    throw new \RuntimeException(ob_get_clean());
+    throw new RuntimeException(ob_get_clean());
   }
 
   /**

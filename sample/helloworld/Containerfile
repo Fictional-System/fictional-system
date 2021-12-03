@@ -1,3 +1,3 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
 
-FROM hello-world:${VERSION}
+FROM hello-world:${FROM_TAG}

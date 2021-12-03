@@ -12,20 +12,22 @@ class Template extends ArrayObject
       'base' => [
         'version' => 1,
         'default' => [
-          'versions' => [
+          'from' => [],
+          'tags' => [
             'latest' => [
-              'arguments' => [],
-              'env' => [],
-              'from' => [],
+              'arguments' => [
+                'FROM_TAG' => 'latest',
+              ],
             ],
           ],
-          'arguments' => [],
-          'env' => [],
-          'volumes' => ['$PWD:/app'],
+          'arguments' => [
+            'FROM_TAG' => 'latest',
+          ],
+          'volumes' => ['$PWD:/app:z'],
           'ports' => [],
           'interactive' => false,
           'detached' => false,
-          'match-ids' => false,
+          'match_ids' => false,
           'workdir' => '/app'
         ],
         'commands' => [],
@@ -56,7 +58,12 @@ class Template extends ArrayObject
 
   public function toJson(): string
   {
-    return json_encode($this->getArrayCopy(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return self::arrayToJson($this->getArrayCopy());
+  }
+
+  public static function arrayToJson(array $arr): string
+  {
+    return trim(json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . PHP_EOL;
   }
 
   public static function getTemplate(array $names = [], int $version = 1): Template

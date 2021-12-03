@@ -1,11 +1,11 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
+ARG APK_DEP=""
 
-FROM localhost/fs/node/npm:${VERSION}
+FROM localhost/fs/node/node:${FROM_TAG}
 
 USER root
 
-RUN apk add --no-cache git
-
+RUN apk add --no-cache ${APK_DEP}
 RUN npm install -g @ionic/cli
 
 USER node

@@ -1,9 +1,0 @@
-name=composer
-commmand=composer
-versions=8
-volumes=$PWD:/app $HOME/.composer/cache:/home/php/.composer/cache
-from=php
-
-interactive=true
-detached=false
-idmatch=true

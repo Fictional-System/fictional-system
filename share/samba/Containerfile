@@ -1,6 +1,6 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
 
-FROM fedora:${VERSION}
+FROM fedora:${FROM_TAG}
 
 RUN dnf install -y samba
 

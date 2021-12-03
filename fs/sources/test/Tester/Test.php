@@ -2,10 +2,12 @@
 
 namespace Tester;
 
+use RuntimeException;
+
 class Test implements ITest
 {
   private array $errors = [];
-  private string $output = "";
+  private string $output = '';
   private bool $dev = false;
 
   public function __construct(private string $name, private $cb)
@@ -57,11 +59,19 @@ class Test implements ITest
     return $ret;
   }
 
-  public function run(...$args): TestReturn
+  private function run(...$args): TestReturn
   {
     exec(($this->dev ? 'php /fs/fs/run.php ' : 'php /usr/local/bin/fs.phar ') . implode(' ', $args) . ' 2>&1', $output, $return);
 
     return new TestReturn($output, $return);
+  }
+
+  public function shadowRun(...$args): void
+  {
+    if ($this->run(...$args)->getReturn() !== 0)
+    {
+      $this->addError();
+    }
   }
 
   private function addError(): void
@@ -123,6 +133,14 @@ class Test implements ITest
     }
   }
 
+  public function assertFileNotExist(string $path): void
+  {
+    if (file_exists($path))
+    {
+      $this->addError();
+    }
+  }
+
   public function assertFileExist(string $path): void
   {
     if (!file_exists($path))
@@ -139,11 +157,45 @@ class Test implements ITest
     }
   }
 
-  public function assertFileContent(string $path, string $content): void
+  public function assertFileContent(string $path, string $content, bool $debugOutput = false): void
   {
+    if ($debugOutput)
+    {
+      var_dump([$path => file_get_contents($path)]);
+    }
+
     if (!file_exists($path) || is_dir($path) || (file_get_contents($path) !== $content))
     {
       $this->addError();
+    }
+  }
+
+  public function assertRun(string $args, int $return, string $output, bool $debugOutput = false): void
+  {
+    $cr = $this->run($args);
+
+    if ($debugOutput)
+    {
+      $cr->dump();
+    }
+
+    if ($cr->getReturn() !== $return)
+    {
+      $this->addError();
+      return;
+    }
+
+    if ($cr->getOutputString() !== $output)
+    {
+      $this->addError();
+    }
+  }
+
+  public function mkdir(string $dir): void
+  {
+    if (@mkdir($dir, 0700, true) === false)
+    {
+      throw new RuntimeException("Unable to create `$dir`.");
     }
   }
 }

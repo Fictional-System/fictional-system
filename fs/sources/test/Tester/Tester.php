@@ -2,6 +2,8 @@
 
 namespace Tester;
 
+use Exception;
+
 class Tester
 {
   /**
@@ -83,9 +85,9 @@ class Tester
         $test->reset();
         $test->call($this->dev);
       }
-      catch (\Exception $e)
+      catch (Exception $e)
       {
-        $test->addFailure($e->getFile(), $e->getFile(), 'Unexpected exception : "' . $e->getMessage() . '"');
+        $test->addFailure($e->getFile(), $e->getLine(), 'Unexpected exception : "' . $e->getMessage() . '"');
       }
 
       if (!$test->isFailed())

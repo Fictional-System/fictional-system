@@ -1,0 +1,34 @@
+{
+    "version": 1,
+    "default": {
+        "from": [
+            "php"
+        ],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            }
+        },
+        "arguments": {
+            "APK_TEMP_ADD": "pcre-dev",
+            "PECL_INSTALL": "xdebug",
+            "DOCKER_PHP_EXT_ENABLE": "xdebug"
+        },
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "xdebug": {
+            "command": "xdebug",
+            "enabled": false
+        }
+    }
+}

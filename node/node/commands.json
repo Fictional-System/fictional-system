@@ -1,0 +1,28 @@
+{
+    "version": 1,
+    "default": {
+        "from": [],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": 16
+                }
+            }
+        },
+        "arguments": [],
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "npm": {
+            "command": "npm",
+            "enabled": false
+        }
+    }
+}

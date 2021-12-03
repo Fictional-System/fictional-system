@@ -2,9 +2,11 @@
 
 namespace FS;
 
+use Command\Build\Build;
 use Command\Command;
 use Command\Create\Create;
 use Command\Duplicate\Duplicate;
+use Command\Script\Script;
 use Command\Status\Disable;
 use Command\Status\Enable;
 use Exception;
@@ -15,10 +17,12 @@ class FS extends Command
    * @var Command[] $commands
    */
   private array $commands = [
+    'build' => Build::class,
     'create' => Create::class,
     'disable' => Disable::class,
     'duplicate' => Duplicate::class,
     'enable' => Enable::class,
+    'script' => Script::class,
   ];
 
   public static function getShortDescription(): string

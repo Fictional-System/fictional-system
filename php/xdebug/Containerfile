@@ -1,20 +1,19 @@
-ARG VERSION=latest
+ARG FROM_TAG=latest
 ARG APK_ADD=""
 ARG APK_TEMP_ADD=""
 ARG DOCKER_PHP_EXT_INSTALL=""
 ARG PECL_INSTALL=""
 ARG DOCKER_PHP_EXT_ENABLE=""
 
-FROM localhost/fs/php/php:${VERSION}
+FROM localhost/fs/php/php:${FROM_TAG}
 
 USER root
+ENV XDEBUG_MODE debug
 
 RUN apk add --no-cache ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS}
-RUN docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}
-RUN pecl install ${PECL_INSTALL}
-RUN docker-php-ext-enable ${DOCKER_PHP_EXT_ENABLE}
+RUN [ -z ${DOCKER_PHP_EXT_INSTALL} ] ||  docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}
+RUN [ -z ${PECL_INSTALL} ] || pecl install ${PECL_INSTALL}
+RUN [ -z ${DOCKER_PHP_EXT_ENABLE} ] || docker-php-ext-enable ${DOCKER_PHP_EXT_ENABLE}
 RUN apk del ${APK_TEMP_ADD} ${PHPIZE_DEPS}
-
-WORKDIR /app
 
 USER php

@@ -1,0 +1,28 @@
+{
+    "version": 1,
+    "default": {
+        "from": [],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            }
+        },
+        "arguments": {
+            "FROM_TAG": "latest"
+        },
+        "volumes": [],
+        "ports": [],
+        "interactive": false,
+        "detached": false,
+        "match-ids": false,
+        "workdir": "/app"
+    },
+    "commands": {
+        "helloworld": {
+            "command": "",
+            "enabled": false
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "version": 1,
+    "default": {
+        "tags": {
+            "latest": {
+                "from": [],
+                "arguments": {
+                    "FROM_TAG": "8"
+                }
+            }
+        },
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "php": {
+            "command": "php",
+            "enabled": false
+        }
+    }
+}

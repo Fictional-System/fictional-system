@@ -5,6 +5,7 @@ namespace Command\Duplicate;
 use Command\Command;
 use Command\Config;
 use Command\Create\Create;
+use Exception;
 use RuntimeException;
 
 class Duplicate extends Command
@@ -34,6 +35,9 @@ class Duplicate extends Command
     ];
   }
 
+  /**
+   * @throws Exception
+   */
   public function call(): void
   {
     if ($this->argc !== 2)
@@ -118,7 +122,7 @@ class Duplicate extends Command
     }
     else
     {
-      if (!mkdir($to, 0755))
+      if (!mkdir($to, 0700))
       {
         throw new RuntimeException("Unable to copy `$from` to `$to`.");
       }
@@ -134,6 +138,9 @@ class Duplicate extends Command
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function duplicateCommand(array $left, array $right): void
   {
     if (!file_exists("$this->cwd/${left[0]}/${left[1]}/commands.json"))
@@ -161,6 +168,9 @@ class Duplicate extends Command
     echo "Command `${left[0]}/${left[1]}/${left[2]}` duplicate to `${right[0]}/${right[1]}/${right[2]}`." . PHP_EOL;
   }
 
+  /**
+   * @throws Exception
+   */
   private function duplicateNewCommand(array $left, array $right): void
   {
     if (!file_exists("$this->cwd/${right[0]}/${right[1]}/commands.json"))

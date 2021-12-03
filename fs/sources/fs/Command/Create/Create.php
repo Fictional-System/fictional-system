@@ -42,7 +42,7 @@ class Create extends Command
 
     foreach ($this->argv as $name)
     {
-      call_user_func_array([$this, 'createDomain'], explode('/', $name));
+      $this->createDomain(...explode('/', $name));
     }
   }
 
@@ -123,13 +123,13 @@ class Create extends Command
       }
     }
 
-    if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0755))
+    if (!file_exists($dir) && !is_dir($dir) && !mkdir($dir, 0700))
     {
       throw new RuntimeException("Unable to create `$dir`");
     }
   }
 
-  private function createFile(string $file, bool $force = false, string $content = ""): void
+  private function createFile(string $file, bool $force = false, string $content = ''): void
   {
     if (file_exists($file))
     {
@@ -143,7 +143,7 @@ class Create extends Command
         throw new RuntimeException("`$file` already exist.");
       }
     }
-    else if (file_put_contents($file, $content) === false)
+    else if (@file_put_contents($file, $content) === false)
     {
       throw new RuntimeException("Unable to create `$file`");
     }

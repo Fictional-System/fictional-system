@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "default": {
+        "from": [
+            "xdebug"
+        ],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            }
+        },
+        "arguments": {
+            "APK_ADD": "",
+            "APK_TEMP_ADD": "libzip-dev",
+            "DOCKER_PHP_EXT_INSTALL": "zip"
+        },
+        "volumes": [
+            "$PWD:/app",
+            "$HOME/.composer/cache:/home/php/.composer/cache"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match-ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "composer": {
+            "command": "composer",
+            "enabled": false
+        }
+    }
+}

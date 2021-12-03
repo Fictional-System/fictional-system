@@ -1,0 +1,32 @@
+{
+    "version": 1,
+    "default": {
+        "from": [
+            "node"
+        ],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            }
+        },
+        "arguments": {
+            "FROM_TAG": "latest"
+        },
+        "volumes": [
+            "$PWD:/app"
+        ],
+        "ports": [],
+        "interactive": false,
+        "detached": false,
+        "match-ids": false,
+        "workdir": "/app"
+    },
+    "commands": {
+        "ng": {
+            "command": "ng",
+            "enabled": false
+        }
+    }
+}
