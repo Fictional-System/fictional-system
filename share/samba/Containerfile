@@ -1,5 +1,4 @@
 ARG FROM_TAG=latest
-
 FROM fedora:${FROM_TAG}
 
 RUN dnf install -y samba
