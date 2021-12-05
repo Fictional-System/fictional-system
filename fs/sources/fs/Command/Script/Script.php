@@ -160,7 +160,7 @@ class Script extends Command
   {
     $cmdline = ['podman run --rm'];
 
-    !$this->getValue($config, 'interactive', false) ?: $cmdline[] = '-it';
+    !$this->getValue($config, 'interactive', false) ?: $cmdline[] = '--init -it';
     !$this->getValue($config, 'detached', false) ?: $cmdline[] = '-d';
     !$this->getValue($config, 'match_ids', false) ?: $cmdline[] = '--userns=keep-id';
     !$this->getValue($config, 'workdir', false) ?: $cmdline[] = '-w ' . $this->getValue($config, 'workdir');

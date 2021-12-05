@@ -82,7 +82,7 @@ class Script
       preg_replace('/[^A-Za-z0-9]/', '_', $this->version);
 
     $cmdline = ['podman run --rm'];
-    !$this->interactive ?: $cmdline[] = '-it';
+    !$this->interactive ?: $cmdline[] = '--init -it';
     !$this->detached ?: $cmdline[] = '-d';
     !$this->maths_ids ?: $cmdline[] = '--userns=keep-id';
     $this->workdir == '' ?: $cmdline[] = '-w ' . $this->workdir;
