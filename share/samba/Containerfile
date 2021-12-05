@@ -15,6 +15,5 @@ RUN while IFS=":" read -r user pass; do \
 RUN rm -f /tmp/users.list
 
 RUN mkdir -p /data/share
-WORKDIR /data/share
 
 CMD /bin/bash -c "smbd --foreground --log-stdout --no-process-group"
