@@ -7,6 +7,7 @@ class Script
   private string $prefix = 'localhost/fs';
   private string $workdir = '/app';
   private array $volumes = [];
+  private array $ports = [];
   private array $envs = [];
   private bool $interactive = false;
   private bool $maths_ids = false;
@@ -24,6 +25,13 @@ class Script
   public function addVolume(string $volume): Script
   {
     $this->volumes[] = $volume;
+
+    return $this;
+  }
+
+  public function addPorts(string $port): Script
+  {
+    $this->ports[] = $port;
 
     return $this;
   }
@@ -82,6 +90,10 @@ class Script
     foreach ($this->envs as $env)
     {
       $cmdline[] = "--env-file $env";
+    }
+    foreach ($this->ports as $port)
+    {
+      $cmdline[] = "-p $port";
     }
     foreach ($this->volumes as $volume)
     {

@@ -174,6 +174,19 @@ class Script extends Command
 
     $cmdline[] = '--name ' . $name . '_$$';
     !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
+    foreach ($this->getValue($config, 'ports', []) as $port)
+    {
+      switch (count(explode(':', $port)))
+      {
+        case 2:
+        case 3:
+          break;
+        default:
+          throw new RuntimeException("Bad format in ports definition for `$commandName`.");
+      }
+
+      $cmdline[] = "-p $port";
+    }
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
       switch (count(explode(':', $volume)))

@@ -217,3 +217,32 @@ Tester::it('Script workdir', function (ITest $tester): void {
       ->getScript()
   );
 });
+
+Tester::it('Script ports', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['ports'][] = '1234:1234';
+  $config['commands']['foo']['ports'][] = '5678:5678';
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->mkdir('bin');
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app:z')
+      ->addPorts('1234:1234')
+      ->addPorts('5678:5678')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app:z')
+      ->addPorts('1234:1234')
+      ->getScript()
+  );
+});
