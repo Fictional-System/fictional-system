@@ -1,11 +1,10 @@
 ARG FROM_TAG=latest
-ARG APK_DEP=""
-
 FROM localhost/fs/node/node:${FROM_TAG}
-
 USER root
 
-RUN apk add --no-cache ${APK_DEP}
+ARG APK_DEP=""
+
+RUN [ ${#APK_DEP} -eq 0 ] || apk add --no-cache ${APK_DEP}
 RUN npm install -g @angular/cli
 
 USER node

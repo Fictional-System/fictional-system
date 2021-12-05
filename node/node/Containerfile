@@ -1,11 +1,11 @@
 ARG FROM_TAG=latest
-ARG APK_DEP=""
-
 FROM docker.io/library/node:${FROM_TAG}-alpine
-
 USER root
 
+ARG APK_DEP=""
+
 RUN apk add --no-cache git ${APK_DEP}
+RUN npm update -g npm
 
 RUN mkdir /app
 WORKDIR /app
