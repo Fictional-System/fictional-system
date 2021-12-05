@@ -17,7 +17,7 @@
         "interactive": false,
         "detached": false,
         "match-ids": false,
-        "workdir": "/app"
+        "workdir": ""
     },
     "commands": {
         "helloworld": {
