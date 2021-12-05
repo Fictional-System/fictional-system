@@ -15,7 +15,7 @@
         "ports": [],
         "interactive": true,
         "detached": false,
-        "match-ids": true,
+        "match_ids": true,
         "workdir": "/app"
     },
     "commands": {
