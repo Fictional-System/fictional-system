@@ -3,13 +3,16 @@ name: Tests
 on:
   push:
     branches:
-    - main
-    - V*
+    - alpha
+    - beta
+    - '*-dev'
   pull_request:
     branches:
-    - main
-    - V*
-    - feature/*
+    - alpha
+    - beta
+    - '*-dev'
+    - 'feature/*'
+    - 'fix/*'
 
 jobs:
   tests:
