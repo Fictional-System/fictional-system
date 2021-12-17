@@ -103,8 +103,17 @@ class Script
     !$this->command ?: $cmdline[] = $this->command;
     $cmdline[] = '$*';
 
+    $dirsToCreateString = '';
+    if (count($this->volumes))
+    {
+      $dirsToCreateString = "mkdir -p " . implode(' ', array_map(function ($volume) {
+          return explode(':', $volume)[0];
+        }, $this->volumes)) . PHP_EOL . PHP_EOL;
+    }
+
+
     return '#!/bin/sh' . PHP_EOL . PHP_EOL .
       'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
-      implode(' ', $cmdline) . PHP_EOL;
+      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL;
   }
 }

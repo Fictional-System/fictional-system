@@ -187,6 +187,9 @@ class Script extends Command
 
       $cmdline[] = "-p $port";
     }
+
+    $dirsToCreate = [];
+    $dirsToCreateString = '';
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
       switch (count(explode(':', $volume)))
@@ -197,9 +200,11 @@ class Script extends Command
         default:
           throw new RuntimeException("Bad format in volumes definition for `$commandName`.");
       }
+      $dirsToCreate[] = explode(':', $volume)[0];
 
       $cmdline[] = "-v $volume";
     }
+    !count($dirsToCreate) ?: $dirsToCreateString = "mkdir -p " . implode(' ', $dirsToCreate) . PHP_EOL . PHP_EOL;
     $cmdline[] = $this->prefix . "/$domain/$component:$tag";
     !$this->getValue($config, 'command', false) ?: $cmdline[] = $this->getValue($config, 'command');
     $cmdline[] = '$*';
@@ -213,7 +218,7 @@ class Script extends Command
       $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL .
       'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
-      implode(' ', $cmdline) . PHP_EOL);
+      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL);
   }
 
   private function getValue($config, $key, $default = ''): mixed
