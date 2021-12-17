@@ -73,6 +73,8 @@ class Script extends Command
 
     $this->completeScriptsName($component);
     $count = 0;
+    $this->fw->mkdir('bin');
+    $this->fw->cleanDir('bin', ['fs']);
     foreach ($component as $componentNameAndTag => $commands)
     {
       [$componentFullName, $componentTag] = explode(':', $componentNameAndTag);
