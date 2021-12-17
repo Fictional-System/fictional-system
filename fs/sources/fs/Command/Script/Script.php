@@ -173,7 +173,7 @@ class Script extends Command
       Config::cleanTag($tag);
 
     $cmdline[] = '--name ' . $name . '_$$';
-    !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
+    !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file "$base/' . "$domain/$component/cache/$command.env\"";
     foreach ($this->getValue($config, 'ports', []) as $port)
     {
       switch (count(explode(':', $port)))
@@ -211,7 +211,9 @@ class Script extends Command
       (($tag === 'latest') ? '' : '_' . Config::cleanTag($tag));
     $this->write(
       $scriptname,
-      '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);
+      '#!/bin/sh' . PHP_EOL . PHP_EOL .
+      'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
+      implode(' ', $cmdline) . PHP_EOL);
   }
 
   private function getValue($config, $key, $default = ''): mixed

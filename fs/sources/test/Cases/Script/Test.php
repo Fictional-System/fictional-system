@@ -103,7 +103,7 @@ Tester::it('Use env file', function (ITest $tester): void {
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
       ->addVolume('$PWD:/app:z')
-      ->addEnvFile('/app/foo/bar/cache/foo.env')
+      ->addEnvFile('foo/bar/cache/foo.env')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');

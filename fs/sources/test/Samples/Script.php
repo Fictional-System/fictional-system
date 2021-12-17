@@ -89,7 +89,7 @@ class Script
     $cmdline[] = '--name ' . $name . '_$$';
     foreach ($this->envs as $env)
     {
-      $cmdline[] = "--env-file $env";
+      $cmdline[] = "--env-file \"\$base/$env\"";
     }
     foreach ($this->ports as $port)
     {
@@ -103,6 +103,8 @@ class Script
     !$this->command ?: $cmdline[] = $this->command;
     $cmdline[] = '$*';
 
-    return '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL;
+    return '#!/bin/sh' . PHP_EOL . PHP_EOL .
+      'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
+      implode(' ', $cmdline) . PHP_EOL;
   }
 }
