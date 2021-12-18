@@ -11,6 +11,7 @@ class FileWrapper
     '..',
     '.git',
     '.github',
+    '.idea',
     'bin',
     'fs',
   ];
