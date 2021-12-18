@@ -73,6 +73,8 @@ class Script extends Command
 
     $this->completeScriptsName($component);
     $count = 0;
+    $this->fw->mkdir('bin');
+    $this->fw->cleanDir('bin', ['fs']);
     foreach ($component as $componentNameAndTag => $commands)
     {
       [$componentFullName, $componentTag] = explode(':', $componentNameAndTag);
@@ -160,7 +162,7 @@ class Script extends Command
   {
     $cmdline = ['podman run --rm'];
 
-    !$this->getValue($config, 'interactive', false) ?: $cmdline[] = '-it';
+    !$this->getValue($config, 'interactive', false) ?: $cmdline[] = '--init -it';
     !$this->getValue($config, 'detached', false) ?: $cmdline[] = '-d';
     !$this->getValue($config, 'match_ids', false) ?: $cmdline[] = '--userns=keep-id';
     !$this->getValue($config, 'workdir', false) ?: $cmdline[] = '-w ' . $this->getValue($config, 'workdir');
@@ -173,7 +175,23 @@ class Script extends Command
       Config::cleanTag($tag);
 
     $cmdline[] = '--name ' . $name . '_$$';
-    !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file ' . $this->fw->absolutePath("$domain/$component/cache/$command.env");
+    !$this->fw->fileExists("$domain/$component/cache/$command.env") ?: $cmdline[] = '--env-file "$base/' . "$domain/$component/cache/$command.env\"";
+    foreach ($this->getValue($config, 'ports', []) as $port)
+    {
+      switch (count(explode(':', $port)))
+      {
+        case 2:
+        case 3:
+          break;
+        default:
+          throw new RuntimeException("Bad format in ports definition for `$commandName`.");
+      }
+
+      $cmdline[] = "-p $port";
+    }
+
+    $dirsToCreate = [];
+    $dirsToCreateString = '';
     foreach ($this->getValue($config, 'volumes', []) as $volume)
     {
       switch (count(explode(':', $volume)))
@@ -184,9 +202,11 @@ class Script extends Command
         default:
           throw new RuntimeException("Bad format in volumes definition for `$commandName`.");
       }
+      $dirsToCreate[] = explode(':', $volume)[0];
 
       $cmdline[] = "-v $volume";
     }
+    !count($dirsToCreate) ?: $dirsToCreateString = "mkdir -p " . implode(' ', $dirsToCreate) . PHP_EOL . PHP_EOL;
     $cmdline[] = $this->prefix . "/$domain/$component:$tag";
     !$this->getValue($config, 'command', false) ?: $cmdline[] = $this->getValue($config, 'command');
     $cmdline[] = '$*';
@@ -198,7 +218,9 @@ class Script extends Command
       (($tag === 'latest') ? '' : '_' . Config::cleanTag($tag));
     $this->write(
       $scriptname,
-      '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL);
+      '#!/bin/sh' . PHP_EOL . PHP_EOL .
+      'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
+      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL);
   }
 
   private function getValue($config, $key, $default = ''): mixed

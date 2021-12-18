@@ -12,18 +12,18 @@
             }
         },
         "arguments": {
-            "APK_ADD": "",
-            "APK_TEMP_ADD": "libzip-dev",
+            "APK_ADD": "libzip-dev",
+            "APK_TEMP_ADD": "",
             "DOCKER_PHP_EXT_INSTALL": "zip"
         },
         "volumes": [
-            "$PWD:/app",
-            "$HOME/.composer/cache:/home/php/.composer/cache"
+            "$PWD:/app:z",
+            "$HOME/.composer/cache:/home/php/.composer/cache:z"
         ],
         "ports": [],
         "interactive": true,
         "detached": false,
-        "match-ids": true,
+        "match_ids": true,
         "workdir": "/app"
     },
     "commands": {

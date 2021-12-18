@@ -18,15 +18,22 @@
             "$PWD:/app"
         ],
         "ports": [],
-        "interactive": false,
+        "interactive": true,
         "detached": false,
-        "match-ids": false,
+        "match_ids": true,
         "workdir": "/app"
     },
     "commands": {
         "ionic": {
             "command": "ionic",
             "enabled": false
+        },
+        "ionic_serve": {
+            "command": "ionic serve --external --no-open -- --disable-host-check",
+            "enabled": false,
+            "ports": [
+                "8100:8100"
+            ]
         }
     }
 }

@@ -67,6 +67,11 @@ class FileWrapper
 
   public function cleanDir(string $path = '.', array $except = []): void
   {
+    if (!$this->fileExists($path) || !$this->isDir($path))
+    {
+      return;
+    }
+
     $except = array_merge(['.', '..'], $except);
     foreach ($this->scandir($path) as $p)
     {
@@ -118,6 +123,15 @@ class FileWrapper
 
   public function mkdir(string $path): void
   {
+    if ($this->fileExists($path))
+    {
+      if (!$this->isDir($path))
+      {
+        throw new RuntimeException("Unable to create `$path`. It already exist as a file.");
+      }
+      return;
+    }
+
     if (@mkdir($this->absolutePath($path), 0700, true) === false)
     {
       throw new RuntimeException("Unable to create `$path`.");

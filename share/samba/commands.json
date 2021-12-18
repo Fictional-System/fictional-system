@@ -22,7 +22,7 @@
         "interactive": false,
         "detached": true,
         "match-ids": false,
-        "workdir": "/app"
+        "workdir": ""
     },
     "commands": {
         "samba": {

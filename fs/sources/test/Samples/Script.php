@@ -7,6 +7,7 @@ class Script
   private string $prefix = 'localhost/fs';
   private string $workdir = '/app';
   private array $volumes = [];
+  private array $ports = [];
   private array $envs = [];
   private bool $interactive = false;
   private bool $maths_ids = false;
@@ -24,6 +25,13 @@ class Script
   public function addVolume(string $volume): Script
   {
     $this->volumes[] = $volume;
+
+    return $this;
+  }
+
+  public function addPorts(string $port): Script
+  {
+    $this->ports[] = $port;
 
     return $this;
   }
@@ -74,14 +82,18 @@ class Script
       preg_replace('/[^A-Za-z0-9]/', '_', $this->version);
 
     $cmdline = ['podman run --rm'];
-    !$this->interactive ?: $cmdline[] = '-it';
+    !$this->interactive ?: $cmdline[] = '--init -it';
     !$this->detached ?: $cmdline[] = '-d';
     !$this->maths_ids ?: $cmdline[] = '--userns=keep-id';
     $this->workdir == '' ?: $cmdline[] = '-w ' . $this->workdir;
     $cmdline[] = '--name ' . $name . '_$$';
     foreach ($this->envs as $env)
     {
-      $cmdline[] = "--env-file $env";
+      $cmdline[] = "--env-file \"\$base/$env\"";
+    }
+    foreach ($this->ports as $port)
+    {
+      $cmdline[] = "-p $port";
     }
     foreach ($this->volumes as $volume)
     {
@@ -91,6 +103,17 @@ class Script
     !$this->command ?: $cmdline[] = $this->command;
     $cmdline[] = '$*';
 
-    return '#!/bin/sh' . PHP_EOL . PHP_EOL . implode(' ', $cmdline) . PHP_EOL;
+    $dirsToCreateString = '';
+    if (count($this->volumes))
+    {
+      $dirsToCreateString = "mkdir -p " . implode(' ', array_map(function ($volume) {
+          return explode(':', $volume)[0];
+        }, $this->volumes)) . PHP_EOL . PHP_EOL;
+    }
+
+
+    return '#!/bin/sh' . PHP_EOL . PHP_EOL .
+      'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
+      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL;
   }
 }

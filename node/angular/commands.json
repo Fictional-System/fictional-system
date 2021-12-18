@@ -18,15 +18,22 @@
             "$PWD:/app"
         ],
         "ports": [],
-        "interactive": false,
+        "interactive": true,
         "detached": false,
-        "match-ids": false,
+        "match_ids": true,
         "workdir": "/app"
     },
     "commands": {
         "ng": {
             "command": "ng",
             "enabled": false
+        },
+        "ng_serve": {
+            "command": "ng serve --disable-host-check --host=0.0.0.0",
+            "enabled": false,
+            "ports": [
+                "4200:4200"
+            ]
         }
     }
 }

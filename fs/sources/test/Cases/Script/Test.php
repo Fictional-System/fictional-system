@@ -33,7 +33,6 @@ Tester::it('Generate all scripts', function (ITest $tester): void {
   $tester->shadowRun('enable foo');
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -54,7 +53,6 @@ Tester::it('Duplicate command in same domain', function (ITest $tester): void {
   $tester->shadowRun('enable foo/bar/test foo/foo/test');
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/bar_test');
   $tester->assertFileContent('bin/bar_test',
@@ -75,7 +73,6 @@ Tester::it('Duplicate command in other domain', function (ITest $tester): void {
   $tester->shadowRun('enable foo/bar/test bar/bar/test');
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo_bar_test');
   $tester->assertFileContent('bin/foo_bar_test',
@@ -97,13 +94,12 @@ Tester::it('Use env file', function (ITest $tester): void {
   file_put_contents('foo/bar/files/foo.env', 'FOO=bar');
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
     Script::get('foo/bar/foo', 'latest', 'foo')
       ->addVolume('$PWD:/app:z')
-      ->addEnvFile('/app/foo/bar/cache/foo.env')
+      ->addEnvFile('foo/bar/cache/foo.env')
       ->getScript()
   );
   $tester->assertFileExist('bin/bar');
@@ -123,7 +119,6 @@ Tester::it('Script interactive', function (ITest $tester): void {
   $config->save();
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -149,7 +144,6 @@ Tester::it('Script detached', function (ITest $tester): void {
   $config->save();
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -175,7 +169,6 @@ Tester::it('Script matchid', function (ITest $tester): void {
   $config->save();
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -201,7 +194,6 @@ Tester::it('Script workdir', function (ITest $tester): void {
   $config->save();
   $tester->shadowRun('build');
 
-  $tester->mkdir('bin');
   $tester->assertRun('script all', 0, '2 scripts generated.');
   $tester->assertFileExist('bin/foo');
   $tester->assertFileContent('bin/foo',
@@ -216,4 +208,49 @@ Tester::it('Script workdir', function (ITest $tester): void {
       ->addVolume('$PWD:/app:z')
       ->getScript()
   );
+});
+
+Tester::it('Script ports', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['ports'][] = '1234:1234';
+  $config['commands']['foo']['ports'][] = '5678:5678';
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app:z')
+      ->addPorts('1234:1234')
+      ->addPorts('5678:5678')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app:z')
+      ->addPorts('1234:1234')
+      ->getScript()
+  );
+});
+
+Tester::it('Script clean disabled commands', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('build');
+  $tester->shadowRun('script all');
+
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileExist('bin/bar');
+
+  $tester->shadowRun('disable foo/bar/foo');
+  $tester->shadowRun('build');
+  $tester->shadowRun('script all');
+
+  $tester->assertFileNotExist('bin/foo');
+  $tester->assertFileExist('bin/bar');
 });
