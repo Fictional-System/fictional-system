@@ -7,6 +7,7 @@ prepare: $(DIRS:./%/.=prepare_%)
 build: $(DIRS:./%/.=build_%)
 force_build: $(DIRS:./%/.=force_build_%)
 install: prepare_install $(DIRS:./%/.=install_%)
+	echo -e "\033[1;31mThis version is no longer maintained.\033[0m"
 clean: $(DIRS:./%/.=clean_%)
 	rm -rf ./bin
 	sed -i '/^CC_PATH=/d' ~/.bashrc
