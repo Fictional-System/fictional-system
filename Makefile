@@ -13,8 +13,9 @@ uninstall:
 	[ $$(podman images --quiet ${PREFIX} | wc -l) -eq 0 ] || podman rmi -f $$(podman images --quiet ${PREFIX})
 	sed -i "/^FS_PATH=$${PWD//\//\\/}\/bin/d" ~/.$${SHELL##*/}rc
 
-update: install
-	podman build -q -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
+update:
+	git pull
+	make install
 
 test:
 	podman build -q -t ${PREFIX}fs/test -f ./fs/fs/Containerfile ./fs/sources
