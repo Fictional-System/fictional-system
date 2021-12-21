@@ -4,7 +4,7 @@ all: install
 
 install: test
 	mkdir -p ./bin
-	cp -f ./fs/bin/fs ./bin/fs
+	cp -f ./fs/bin/fs ./bin/fs && chmod +x ./bin/fs
 	podman build -q -t ${PREFIX}fs/fs -f ./fs/fs/Containerfile ./fs/sources
 	echo $${PATH} | grep -q $${PWD}/bin || grep -Eq "^FS_PATH=$${PWD}/bin" ~/.$${SHELL##*/}rc || (echo "FS_PATH=$${PWD}/bin:\$$PATH && export PATH=\$$FS_PATH" >> ~/.$${SHELL##*/}rc && echo -e "\033[0;33mYou need to restart your $${SHELL##*/} to use the new PATH.\033[0m")
 
