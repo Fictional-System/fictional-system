@@ -19,7 +19,7 @@ abstract class SwitchStatus extends Command
     {
       foreach (scandir($this->cwd) as $dir)
       {
-        if (in_array($dir, ['.', '..', '.git', '.github', 'bin', 'fs']))
+        if (in_array($dir, ['.', '..', '.git', '.github', '.idea', 'bin', 'fs']))
         {
           continue;
         }
