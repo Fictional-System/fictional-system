@@ -1,4 +1,5 @@
-# fictional-system
+# Fictional System
+[![Tests](https://github.com/Fictional-System/fictional-system/actions/workflows/tests.yml/badge.svg?branch=beta)](https://github.com/Fictional-System/fictional-system/actions/workflows/tests.yml)
 
 Podman containers as commands for development purpose.
 This project allow you to build some images and use them as unix commmands.
