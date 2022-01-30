@@ -29,7 +29,7 @@ fs_build()
         quiet=""
       fi
 
-      cmd="podman build ${quiet} -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${image_name}/Containerfile ${image_name}/cache"
+      cmd="podman build ${quiet} -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${dir}/${image_name}/Containerfile ${dir}/${image_name}/cache"
 
       echo "Building ${image_name}:${image_tag}"
       if [ "${1}" = "dev" ]
@@ -51,7 +51,7 @@ fs_build()
       image_args=""
       build=$((build+1))
     fi
-  done < "build.cache"
+  done < ${dir}/"build.cache"
 
   if [ $build -gt 0 ]
   then
