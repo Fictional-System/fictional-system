@@ -219,6 +219,10 @@ class Build extends Command
       {
         $this->fw->cleanDir("$path/cache");
       }
+      else
+      {
+        $this->fw->mkdir("$path/cache");
+      }
 
       if ($this->fw->exists("$path/files"))
       {
