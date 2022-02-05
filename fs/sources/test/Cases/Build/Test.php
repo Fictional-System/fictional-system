@@ -552,3 +552,11 @@ Tester::it('Remove files', function (ITest $tester): void {
   $tester->assertFileExist('foo/bar/cache/bar');
   $tester->assertFileContent('foo/bar/cache/bar', 'bar');
 });
+
+Tester::it('Ignore hidden folder', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+  $tester->shadowRun('enable foo/bar/test');
+  $tester->mkdir('foo/.test');
+
+  $tester->shadowRun('build');
+});

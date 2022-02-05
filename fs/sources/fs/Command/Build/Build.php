@@ -45,7 +45,7 @@ class Build extends Command
 
     foreach (scandir($this->cwd) as $domain)
     {
-      if (in_array($domain, FileWrapper::IGNORED_ROOT_FILES))
+      if (in_array($domain, FileWrapper::IGNORED_ROOT_FILES) || str_starts_with($domain, '.'))
       {
         continue;
       }
@@ -53,7 +53,7 @@ class Build extends Command
       {
         foreach (scandir("$this->cwd/$domain") as $component)
         {
-          if (in_array($component, FileWrapper::IGNORED_FILES))
+          if (in_array($component, FileWrapper::IGNORED_FILES) || str_starts_with($component, '.'))
           {
             continue;
           }
