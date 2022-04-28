@@ -254,3 +254,21 @@ Tester::it('Script clean disabled commands', function (ITest $tester): void {
   $tester->assertFileNotExist('bin/foo');
   $tester->assertFileExist('bin/bar');
 });
+
+Tester::it('Script not prefix different version', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo');
+  $tester->shadowRun('enable foo/bar/foo');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['tags']['42'] = [
+    "arguments" => [
+      "FROM_TAG" => "42"
+    ]
+  ];
+  $config->save();
+  $tester->shadowRun('build');
+  $tester->shadowRun('script all');
+
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileExist('bin/foo_42');
+});

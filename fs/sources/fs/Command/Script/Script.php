@@ -24,19 +24,19 @@ class Script extends Command
 
   public static function getUsage(): array
   {
-    return ['fs enable [domain[/component[/command[:version]]]]'];
+    return ['fs script [domain[/component[/command[:version]]]]'];
   }
 
   public static function getExamples(): array
   {
     return [
       'fs script all',
-      'fs enable foo',
-      'fs enable foo/bar',
-      'fs enable foo/bar/test',
-      'fs enable foo/bar/test:latest',
-      'fs enable foo/bar/test bar/foo/test',
-      'fs enable foo/bar/foo foo/bar/bar',
+      'fs script foo',
+      'fs script foo/bar',
+      'fs script foo/bar/test',
+      'fs script foo/bar/test:latest',
+      'fs script foo/bar/test bar/foo/test',
+      'fs script foo/bar/foo foo/bar/bar',
     ];
   }
 
@@ -118,8 +118,8 @@ class Script extends Command
       [$domainName, $componentName] = explode('/', $componentFullName);
       foreach ($commands as $commandName => $command)
       {
-        $simplesCommand[$commandName][] = "$domainName/$componentName/$commandName:$componentTag";
-        $componentsCommand["$componentName/$commandName"][] = "$domainName/$componentName/$commandName:$componentTag";
+        $simplesCommand["$commandName:$componentTag"][] = "$domainName/$componentName/$commandName:$componentTag";
+        $componentsCommand["$componentName/$commandName:$componentTag"][] = "$domainName/$componentName/$commandName:$componentTag";
       }
     }
 
