@@ -10,6 +10,7 @@ class Script
   private array $ports = [];
   private array $envs = [];
   private bool $interactive = false;
+  private bool $init = false;
   private bool $maths_ids = false;
   private bool $detached = false;
 
@@ -39,6 +40,13 @@ class Script
   public function setInteractive(bool $interactive): Script
   {
     $this->interactive = $interactive;
+
+    return $this;
+  }
+
+  public function setInit(bool $init): Script
+  {
+    $this->init = $init;
 
     return $this;
   }
@@ -82,7 +90,8 @@ class Script
       preg_replace('/[^A-Za-z0-9]/', '_', $this->version);
 
     $cmdline = ['podman run --rm'];
-    !$this->interactive ?: $cmdline[] = '--init -it';
+    !$this->init ?: $cmdline[] = '--init';
+    !$this->interactive ?: $cmdline[] = '-it';
     !$this->detached ?: $cmdline[] = '-d';
     !$this->maths_ids ?: $cmdline[] = '--userns=keep-id';
     $this->workdir == '' ?: $cmdline[] = '-w ' . $this->workdir;
