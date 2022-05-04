@@ -560,3 +560,46 @@ Tester::it('Ignore hidden folder', function (ITest $tester): void {
 
   $tester->shadowRun('build');
 });
+
+Tester::it('Configuration syntax error', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/test');
+
+  file_put_contents('foo/bar/commands.json', '
+{
+    "version": 1,
+    "default": {
+        "from": [],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            }
+        },
+        "arguments": {
+            "FROM_TAG": "latest"
+        },
+        "volumes": [
+            "$PWD:/app:z"
+        ],
+        "ports": [],
+        "interactive": false,
+        "detached": false,
+        "match_ids": false,
+        "workdir": "/app"
+    },
+    "commands": {
+        "test": {
+            "command": "test",
+            "enabled": false
+        },
+        "test-error": {
+            "command": "test",
+            "enabled": true,
+        }
+    }
+}
+  ');
+
+  $tester->assertRun('build', 1, 'Syntax error in `/app/foo/bar/commands.json`.');
+});

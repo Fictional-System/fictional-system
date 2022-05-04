@@ -134,7 +134,14 @@ class Config extends ArrayObject
       throw new RuntimeException("Cannot open `$path`.");
     }
 
-    parent::__construct(json_decode($content, true, 512, JSON_THROW_ON_ERROR));
+    try
+    {
+      parent::__construct(json_decode($content, true, 512, JSON_THROW_ON_ERROR));
+    }
+    catch (\Exception $exception)
+    {
+      throw new RuntimeException("Syntax error in `$path`.", 0, $exception);
+    }
 
     if (self::VERSION > $this['version'])
     {
