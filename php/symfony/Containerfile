@@ -1,0 +1,35 @@
+ARG FROM_TAG=latest
+FROM localhost/fs/php/composer:${FROM_TAG}
+USER root
+
+ARG APK_ADD=""
+ARG APK_TEMP_ADD=""
+ARG DOCKER_PHP_EXT_INSTALL=""
+ARG PECL_INSTALL=""
+ARG DOCKER_PHP_EXT_ENABLE=""
+ENV XDEBUG_MODE coverage
+
+RUN apk add --no-cache ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS} bash
+RUN [ ${#DOCKER_PHP_EXT_INSTALL} -eq 0 ] || docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}
+RUN [ ${#PECL_INSTALL} -eq 0 ] || pecl install ${PECL_INSTALL}
+RUN [ ${#DOCKER_PHP_EXT_ENABLE} -eq 0 ] || docker-php-ext-enable ${DOCKER_PHP_EXT_ENABLE}
+RUN apk del ${APK_TEMP_ADD} ${PHPIZE_DEPS}
+
+USER php
+
+WORKDIR /tmp
+RUN curl https://getcomposer.org/installer > composer-setup.php
+RUN curl https://composer.github.io/installer.sha384sum > installer.sha384sum
+RUN sha384sum -c installer.sha384sum
+RUN php composer-setup.php
+RUN rm -f composer-setup.php
+
+USER root
+RUN mv composer.phar /usr/local/bin/composer
+RUN apk del coreutils
+
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash
+RUN apk add symfony-cli
+
+WORKDIR /app
+USER php

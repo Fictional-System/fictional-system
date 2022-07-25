@@ -1,0 +1,61 @@
+{
+    "version": 1,
+    "default": {
+        "from": [
+            "composer"
+        ],
+        "tags": {
+            "latest": {
+                "arguments": {
+                    "FROM_TAG": "latest"
+                }
+            },
+            "8.0": {
+                "arguments": {
+                    "FROM_TAG": "8.0"
+                }
+            },
+            "7.4": {
+                "arguments": {
+                    "FROM_TAG": "7.4"
+                }
+            },
+            "7.3": {
+                "arguments": {
+                    "FROM_TAG": "7.3"
+                }
+            },
+            "7.2": {
+                "arguments": {
+                    "FROM_TAG": "7.2"
+                }
+            }
+        },
+        "arguments": {
+            "APK_TEMP_ADD": "",
+            "DOCKER_PHP_EXT_INSTALL": ""
+        },
+        "volumes": [
+            "$PWD:/app:z",
+            "$HOME/.composer/cache:/home/php/.composer/cache:z"
+        ],
+        "ports": [],
+        "interactive": true,
+        "detached": false,
+        "match_ids": true,
+        "workdir": "/app"
+    },
+    "commands": {
+        "symfony": {
+            "command": "symfony",
+            "enabled": true
+        },
+        "symfony serve": {
+            "command": "symfony serve",
+            "enabled": true,
+            "ports": [
+                "8000:8000"
+            ]
+        }
+    }
+}
