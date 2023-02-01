@@ -7,7 +7,7 @@ ARG DOCKER_PHP_EXT_INSTALL=""
 ARG PECL_INSTALL=""
 ARG DOCKER_PHP_EXT_ENABLE=""
 
-RUN apk add --no-cache ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS}
+RUN apk add --no-cache linux-headers ${APK_ADD} ${APK_TEMP_ADD} ${PHPIZE_DEPS}
 RUN [ ${#DOCKER_PHP_EXT_INSTALL} -eq 0 ] || docker-php-ext-install ${DOCKER_PHP_EXT_INSTALL}
 RUN [ ${#PECL_INSTALL} -eq 0 ] || pecl install ${PECL_INSTALL}
 RUN [ ${#DOCKER_PHP_EXT_ENABLE} -eq 0 ] || docker-php-ext-enable ${DOCKER_PHP_EXT_ENABLE}
