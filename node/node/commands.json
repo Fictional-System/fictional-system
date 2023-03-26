@@ -5,13 +5,13 @@
         "tags": {
             "latest": {
                 "arguments": {
-                    "FROM_TAG": 16
+                    "FROM_TAG": "lts"
                 }
             }
         },
         "arguments": [],
         "volumes": [
-            "$PWD:/app"
+            "$PWD:/app:z"
         ],
         "ports": [],
         "interactive": true,
@@ -22,6 +22,14 @@
     "commands": {
         "npm": {
             "command": "npm",
+            "enabled": false
+        },
+        "yarn": {
+            "command": "yarn",
+            "enabled": false
+        },
+        "node": {
+            "command": "node",
             "enabled": false
         }
     }
