@@ -207,7 +207,18 @@ class Script extends Command
 
       $cmdline[] = "-v $volume";
     }
-    !count($dirsToCreate) ?: $dirsToCreateString = "mkdir -p " . implode(' ', $dirsToCreate) . PHP_EOL . PHP_EOL;
+    !count($dirsToCreate) ?: $dirsToCreateString = "mkdir -p " . implode(' ', $dirsToCreate) . PHP_EOL;
+    $networksToCreate = [];
+    $networksToCreateString = '';
+    foreach ($this->getValue($config, 'networks', []) as $network)
+    {
+      $networksToCreate[] = $network;
+      $cmdline[] = "--network $network";
+    }
+    !count($networksToCreate) ?: $networksToCreateString = implode(PHP_EOL, array_map(function ($networkToCreate) {
+      return "podman network create --ignore " . $networkToCreate;
+    }, $networksToCreate));
+
     $cmdline[] = $this->prefix . "/$domain/$component:$tag";
     !$this->getValue($config, 'command', false) ?: $cmdline[] = $this->getValue($config, 'command');
     $cmdline[] = '$*';
@@ -221,7 +232,8 @@ class Script extends Command
       $scriptname,
       '#!/bin/sh' . PHP_EOL . PHP_EOL .
       'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
-      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL);
+      $dirsToCreateString . $networksToCreateString . PHP_EOL . PHP_EOL .
+      implode(' ', $cmdline) . PHP_EOL);
   }
 
   private function getValue($config, $key, $default = ''): mixed

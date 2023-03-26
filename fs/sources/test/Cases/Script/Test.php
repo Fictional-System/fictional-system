@@ -354,3 +354,32 @@ Tester::it('Script not prefix different version', function (ITest $tester): void
   $tester->assertFileExist('bin/foo');
   $tester->assertFileExist('bin/foo_42');
 });
+
+Tester::it('Script network', function (ITest $tester): void {
+
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['networks'] = ['test-network'];
+  $config['commands']['bar']['networks'] = ['bar-network'];
+  $config->save();
+  $tester->shadowRun('build');
+
+  $tester->assertRun('script all', 0, '2 scripts generated.');
+  $tester->assertFileExist('bin/foo');
+  $tester->assertFileContent('bin/foo',
+    Script::get('foo/bar/foo', 'latest', 'foo')
+      ->addVolume('$PWD:/app:z')
+      ->addNetwork('test-network')
+      ->getScript()
+  );
+  $tester->assertFileExist('bin/bar');
+  $tester->assertFileContent('bin/bar',
+    Script::get('foo/bar/bar', 'latest', 'bar')
+      ->addVolume('$PWD:/app:z')
+      ->addNetwork('test-network')
+      ->addNetwork('bar-network')
+      ->getScript()
+  );
+});
