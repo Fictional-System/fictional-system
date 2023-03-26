@@ -55,6 +55,7 @@ class Config extends ArrayObject
       'from',
       'arguments',
       'volumes',
+      'networks',
       'ports',
       'interactive',
       'init',
@@ -65,6 +66,7 @@ class Config extends ArrayObject
     'tag' => [
       'arguments',
       'volumes',
+      'networks',
       'ports',
       'interactive',
       'init',
@@ -74,6 +76,7 @@ class Config extends ArrayObject
     ],
     'command' => [
       'volumes',
+      'networks',
       'ports',
       'interactive',
       'init',
@@ -86,6 +89,7 @@ class Config extends ArrayObject
       'from',
       'arguments',
       'volumes',
+      'networks',
       'ports',
       'interactive',
       'init',
@@ -96,6 +100,7 @@ class Config extends ArrayObject
     ],
     'cache' => [
       'volumes',
+      'networks',
       'ports',
       'interactive',
       'init',

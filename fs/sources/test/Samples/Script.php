@@ -7,6 +7,7 @@ class Script
   private string $prefix = 'localhost/fs';
   private string $workdir = '/app';
   private array $volumes = [];
+  private array $networks = [];
   private array $ports = [];
   private array $envs = [];
   private bool $interactive = false;
@@ -26,6 +27,13 @@ class Script
   public function addVolume(string $volume): Script
   {
     $this->volumes[] = $volume;
+
+    return $this;
+  }
+
+  public function addNetwork(string $network): Script
+  {
+    $this->networks[] = $network;
 
     return $this;
   }
@@ -108,6 +116,10 @@ class Script
     {
       $cmdline[] = "-v $volume";
     }
+    foreach ($this->networks as $network)
+    {
+      $cmdline[] = "--network $network";
+    }
     $cmdline[] = $imageName;
     !$this->command ?: $cmdline[] = $this->command;
     $cmdline[] = '$*';
@@ -117,12 +129,20 @@ class Script
     {
       $dirsToCreateString = "mkdir -p " . implode(' ', array_map(function ($volume) {
           return explode(':', $volume)[0];
-        }, $this->volumes)) . PHP_EOL . PHP_EOL;
+        }, $this->volumes)) . PHP_EOL;
+    }
+    $networksToCreateString = '';
+    if (count($this->networks))
+    {
+      $networksToCreateString = implode( PHP_EOL, array_map(function ($network) {
+        return "podman network create --ignore " . $network;
+      }, $this->networks));
     }
 
 
     return '#!/bin/sh' . PHP_EOL . PHP_EOL .
       'base=$(dirname $(dirname "$0"))' . PHP_EOL . PHP_EOL .
-      $dirsToCreateString . implode(' ', $cmdline) . PHP_EOL;
+      $dirsToCreateString . $networksToCreateString . PHP_EOL . PHP_EOL .
+      implode(' ', $cmdline) . PHP_EOL;
   }
 }

@@ -603,3 +603,55 @@ Tester::it('Configuration syntax error', function (ITest $tester): void {
 
   $tester->assertRun('build', 1, 'Syntax error in `/app/foo/bar/commands.json`.');
 });
+
+Tester::it('Build with network', function (ITest $tester): void {
+  $tester->shadowRun('create foo/bar/foo foo/bar/bar');
+  $tester->shadowRun('enable foo/bar/foo foo/bar/bar');
+
+  $config = new Config('foo/bar/commands.json');
+  $config['default']['networks'] = ['test-network'];
+  $config['commands']['bar']['networks'] = ['bar-network'];
+  $config->save();
+
+  $tester->assertRun('build', 0, '2 commands to build.');
+  $tester->assertFileExist('build.cache');
+  $tester->assertFileContent('build.cache',
+    'name=foo/bar' . PHP_EOL .
+    'tag=latest' . PHP_EOL .
+    'argument=FROM_TAG latest' . PHP_EOL .
+    'build' . PHP_EOL);
+  $tester->assertFileExist('commands.cache');
+  $tester->assertFileContent('commands.cache', Template::arrayToJson([
+    'foo/bar:latest' => [
+      'foo' => [
+        'volumes' => [
+          '$PWD:/app:z'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match_ids' => false,
+        'workdir' => '/app',
+        'networks' => [
+          'test-network',
+        ],
+        'command' => 'foo',
+      ],
+      'bar' => [
+        'volumes' => [
+          '$PWD:/app:z'
+        ],
+        'ports' => [],
+        'interactive' => false,
+        'detached' => false,
+        'match_ids' => false,
+        'workdir' => '/app',
+        'networks' => [
+          'test-network',
+          'bar-network',
+        ],
+        'command' => 'bar',
+      ],
+    ]
+  ]));
+});

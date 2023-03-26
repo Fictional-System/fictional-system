@@ -161,7 +161,10 @@ class Test implements ITest
   {
     if ($debugOutput)
     {
-      var_dump([$path => file_get_contents($path)]);
+      var_dump([
+        'expected' => $content,
+        $path => file_get_contents($path),
+      ]);
     }
 
     if (!file_exists($path) || is_dir($path) || (file_get_contents($path) !== $content))
