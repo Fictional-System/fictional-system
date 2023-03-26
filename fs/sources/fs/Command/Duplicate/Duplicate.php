@@ -71,34 +71,34 @@ class Duplicate extends Command
 
   private function duplicateDomain(array $left, array $right): void
   {
-    if (!is_dir("$this->cwd/${left[0]}"))
+    if (!is_dir("$this->cwd/{$left[0]}"))
     {
-      throw new RuntimeException("Domain `${left[0]}` does not exist.");
+      throw new RuntimeException("Domain `{$left[0]}` does not exist.");
     }
 
-    if (is_dir("$this->cwd/${right[0]}"))
+    if (is_dir("$this->cwd/{$right[0]}"))
     {
-      throw new RuntimeException("Domain `${right[0]}` already exist.");
+      throw new RuntimeException("Domain `{$right[0]}` already exist.");
     }
 
-    $this->copy("$this->cwd/${left[0]}", "$this->cwd/${right[0]}");
-    echo "Domain `${left[0]}` duplicate to `${right[0]}`." . PHP_EOL;
+    $this->copy("$this->cwd/{$left[0]}", "$this->cwd/{$right[0]}");
+    echo "Domain `{$left[0]}` duplicate to `{$right[0]}`." . PHP_EOL;
   }
 
   private function duplicateComponent(array $left, array $right): void
   {
-    if (!is_dir("$this->cwd/${left[0]}/${left[1]}"))
+    if (!is_dir("$this->cwd/{$left[0]}/{$left[1]}"))
     {
-      throw new RuntimeException("Component `${left[0]}/${left[1]}` does not exist.");
+      throw new RuntimeException("Component `{$left[0]}/{$left[1]}` does not exist.");
     }
 
-    if (is_dir("$this->cwd/${right[0]}/${right[1]}"))
+    if (is_dir("$this->cwd/{$right[0]}/{$right[1]}"))
     {
-      throw new RuntimeException("Component `${right[0]}/${right[1]}` already exist.");
+      throw new RuntimeException("Component `{$right[0]}/{$right[1]}` already exist.");
     }
 
-    $this->copy("$this->cwd/${left[0]}/${left[1]}", "$this->cwd/${right[0]}/${right[1]}");
-    echo "Component `${left[0]}/${left[1]}` duplicate to `${right[0]}/${right[1]}`." . PHP_EOL;
+    $this->copy("$this->cwd/{$left[0]}/{$left[1]}", "$this->cwd/{$right[0]}/{$right[1]}");
+    echo "Component `{$left[0]}/{$left[1]}` duplicate to `{$right[0]}/{$right[1]}`." . PHP_EOL;
   }
 
   private function copy(string $from, string $to): void
@@ -143,9 +143,9 @@ class Duplicate extends Command
    */
   private function duplicateCommand(array $left, array $right): void
   {
-    if (!file_exists("$this->cwd/${left[0]}/${left[1]}/commands.json"))
+    if (!file_exists("$this->cwd/{$left[0]}/{$left[1]}/commands.json"))
     {
-      throw new RuntimeException("Component `${left[0]}/${left[1]}` does not exist.");
+      throw new RuntimeException("Component `{$left[0]}/{$left[1]}` does not exist.");
     }
 
     if (($left[0] !== $right[0]) || ($left[1] !== $right[1]))
@@ -154,18 +154,18 @@ class Duplicate extends Command
       return;
     }
 
-    $config = new Config("$this->cwd/${left[0]}/${left[1]}/commands.json");
+    $config = new Config("$this->cwd/{$left[0]}/{$left[1]}/commands.json");
     if (!$config->hasCommand($left[2]))
     {
-      throw new RuntimeException("Command `${left[0]}/${left[1]}/${left[2]}` does not exist.");
+      throw new RuntimeException("Command `{$left[0]}/{$left[1]}/{$left[2]}` does not exist.");
     }
     if ($config->hasCommand($right[2]))
     {
-      throw new RuntimeException("Command `${right[0]}/${right[1]}/${right[2]}` already exist.");
+      throw new RuntimeException("Command `{$right[0]}/{$right[1]}/{$right[2]}` already exist.");
     }
 
     $config->setCommand($right[2], $config['commands'][$left[2]])->save();
-    echo "Command `${left[0]}/${left[1]}/${left[2]}` duplicate to `${right[0]}/${right[1]}/${right[2]}`." . PHP_EOL;
+    echo "Command `{$left[0]}/{$left[1]}/{$left[2]}` duplicate to `{$right[0]}/{$right[1]}/{$right[2]}`." . PHP_EOL;
   }
 
   /**
@@ -173,30 +173,30 @@ class Duplicate extends Command
    */
   private function duplicateNewCommand(array $left, array $right): void
   {
-    if (!file_exists("$this->cwd/${right[0]}/${right[1]}/commands.json"))
+    if (!file_exists("$this->cwd/{$right[0]}/{$right[1]}/commands.json"))
     {
       Command::callCommand(Create::class, [implode('/', $right)], true);
-      $rightFile = new Config("$this->cwd/${right[0]}/${right[1]}/commands.json");
-      $rightFile['default'] = (new Config("$this->cwd/${left[0]}/${left[1]}/commands.json"))['default'];
+      $rightFile = new Config("$this->cwd/{$right[0]}/{$right[1]}/commands.json");
+      $rightFile['default'] = (new Config("$this->cwd/{$left[0]}/{$left[1]}/commands.json"))['default'];
       $rightFile->save();
     }
     else
     {
-      $rightFile = new Config("$this->cwd/${right[0]}/${right[1]}/commands.json");
+      $rightFile = new Config("$this->cwd/{$right[0]}/{$right[1]}/commands.json");
       if ($rightFile->hasCommand($right[2]))
       {
-        throw new RuntimeException("Command `${right[0]}/${right[1]}/${right[2]}` already exist.");
+        throw new RuntimeException("Command `{$right[0]}/{$right[1]}/{$right[2]}` already exist.");
       }
     }
 
-    $leftFile = new Config("$this->cwd/${left[0]}/${left[1]}/commands.json");
-    $rightFile = new Config("$this->cwd/${right[0]}/${right[1]}/commands.json");
+    $leftFile = new Config("$this->cwd/{$left[0]}/{$left[1]}/commands.json");
+    $rightFile = new Config("$this->cwd/{$right[0]}/{$right[1]}/commands.json");
     if (!$leftFile->hasCommand($left[2]))
     {
-      throw new RuntimeException("Command `${left[0]}/${left[1]}/${left[2]}` does not exist.");
+      throw new RuntimeException("Command `{$left[0]}/{$left[1]}/{$left[2]}` does not exist.");
     }
 
     $rightFile->setCommand($right[2], $leftFile->getCommand($left[2]))->save();
-    echo "Command `${left[0]}/${left[1]}/${left[2]}` duplicate to `${right[0]}/${right[1]}/${right[2]}`." . PHP_EOL;
+    echo "Command `{$left[0]}/{$left[1]}/{$left[2]}` duplicate to `{$right[0]}/{$right[1]}/{$right[2]}`." . PHP_EOL;
   }
 }
