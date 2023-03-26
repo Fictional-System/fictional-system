@@ -15,7 +15,7 @@
             "FROM_TAG": "latest"
         },
         "volumes": [
-            "$PWD:/app"
+            "$PWD:/app:z"
         ],
         "ports": [],
         "interactive": true,
