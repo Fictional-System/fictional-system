@@ -18,6 +18,7 @@ class FS extends Command
    */
   private array $commands = [
     'build' => Build::class,
+    'rebuild' => Build::class,
     'create' => Create::class,
     'disable' => Disable::class,
     'duplicate' => Duplicate::class,

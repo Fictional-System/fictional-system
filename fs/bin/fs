@@ -24,12 +24,17 @@ fs_build()
     elif [ "${key}" = "build" ]
     then
       quiet="-q"
-      if [ "${1}" = "dev" ]
+      if [[ " $* " == *" dev "* ]]
       then
         quiet=""
       fi
+      rebuild=""
+      if [[ " $* " == *" rebuild "* ]]
+      then
+        rebuild="--no-cache"
+      fi
 
-      cmd="podman build ${quiet} -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${dir}/${image_name}/Containerfile ${dir}/${image_name}/cache"
+      cmd="podman build ${quiet} ${rebuild} -t ${prefix}/${image_name}:${image_tag} ${image_args} -f ${dir}/${image_name}/Containerfile ${dir}/${image_name}/cache"
 
       echo "Building ${image_name}:${image_tag}"
       if [ "${1}" = "dev" ]
@@ -73,5 +78,11 @@ then
   if [ $LAST_COMMAND -eq 0 ]
   then
     fs_build $2
+  fi
+elif [ "$1" = "rebuild" ]
+then
+  if [ $LAST_COMMAND -eq 0 ]
+  then
+    fs_build rebuild ${@:2}
   fi
 fi
